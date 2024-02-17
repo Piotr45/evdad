@@ -1,0 +1,23 @@
+defaults:
+  - mlflow: local
+  - config
+  - _self_
+
+dataset: null
+model: null
+
+dataloader:
+  batch_size: 1
+
+optimizer:
+  type: adam
+  lr: 0.001
+
+loss:
+  loss_function: SpikeRate
+  true_rate: 0.2
+  false_rate: 0.03
+  reduction: sum
+
+training:
+  epochs: 10
