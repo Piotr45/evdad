@@ -7,6 +7,7 @@ test_labels: /mnt/d/AI/SNN/Datasets/Highway_Traffic_Videos_Dataset/test_labels.c
 
 img_shape: [260, 346] # HW
 sampling_time: 1
-sample_length: 1050
+sample_length: 300
+reshape_spike: false
 
 num_classes: 3

@@ -18,6 +18,7 @@ class EventDataset(Dataset):
         sampling_time: int,
         sample_length: int,
         num_classes: int,
+        reshape_spike: bool,
     ) -> None:
         self.data_csv: str = data_csv
         self.labels_csv: str = labels_csv
@@ -26,6 +27,8 @@ class EventDataset(Dataset):
         self.sampling_time: int = sampling_time
         self.sample_length: int = sample_length
         self.num_time_bins: int = int(sample_length / sampling_time)
+
+        self.reshape_spike: bool = reshape_spike
 
         self.num_classes: int = num_classes
         self.labels: dict = {"light": 0, "medium": 1, "heavy": 2}
@@ -45,7 +48,9 @@ class EventDataset(Dataset):
             torch.zeros(2, self.img_shape[0], self.img_shape[1], self.num_time_bins),
             sampling_time=self.sampling_time,
         )
-        return spike.reshape(-1, self.num_time_bins), self.labels[label]
+        if self.reshape_spike:
+            return spike.reshape(-1, self.num_time_bins), self.labels[label]
+        return spike, self.labels[label]
 
     @staticmethod
     def read_label(path: str) -> str:

@@ -5,43 +5,51 @@ import torch
 class SimpleDense(torch.nn.Module):
     """Simple Dense model class."""
 
-    def __init__(self):
+    def __init__(
+        self,
+        C: int,
+        H: int,
+        W: int,
+        T: int,
+        threshold: float,
+        current_decay: float,
+        voltage_decay: float,
+        tau_grad: float,
+        scale_grad: float,
+        requires_grad: bool,
+    ):
         super(SimpleDense, self).__init__()
 
         neuron_params = {
-            "threshold": 1.25,
-            "current_decay": 0.25,
-            "voltage_decay": 0.03,
-            "tau_grad": 0.03,
-            "scale_grad": 3,
-            "requires_grad": False,
+            "threshold": threshold,
+            "current_decay": current_decay,
+            "voltage_decay": voltage_decay,
+            "tau_grad": tau_grad,
+            "scale_grad": scale_grad,
+            "requires_grad": requires_grad,
         }
         neuron_params_drop = {
             **neuron_params,
             "dropout": slayer.neuron.Dropout(p=0.05),
         }
-        neuron_params_drop = {**neuron_params}
 
         self.blocks = torch.nn.ModuleList(
             [
                 slayer.block.cuba.Dense(
-                    neuron_params_drop, 260 * 346 * 2, 16, weight_norm=True, delay=True
+                    neuron_params_drop, H * W * C, 512, weight_norm=True, delay=True
                 ),
                 slayer.block.cuba.Dense(
-                    neuron_params_drop, 16, 16, weight_norm=True, delay=True
+                    neuron_params_drop, 512, 512, weight_norm=True, delay=True
                 ),
-                slayer.block.cuba.Dense(neuron_params, 16, 3, weight_norm=True),
+                slayer.block.cuba.Dense(neuron_params, 512, 3, weight_norm=True),
             ]
         )
 
-    def forward(self, spike):
-        count = []
+    def forward(self, spike: torch.Tensor) -> torch.Tensor:
         for block in self.blocks:
             spike = block(spike)
-            count.append(torch.mean(spike).item())
-        return spike, torch.FloatTensor(count).reshape((1, -1)).to(spike.device)
+        return spike
 
-    def grad_flow(self, path):
+    def grad_flow(self) -> torch.Tensor:
         grad = [b.synapse.grad_norm for b in self.blocks if hasattr(b, "synapse")]
-
         return grad

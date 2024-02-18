@@ -16,6 +16,7 @@ class GenericEventDataset:
         sampling_time: int,
         sample_length: int,
         num_classes: int,
+        reshape_spike: bool,
     ) -> None:
         # Paths
         self.train_data: str = train_data
@@ -30,6 +31,7 @@ class GenericEventDataset:
 
         # General info
         self.num_classes: int = num_classes
+        self.reshape_spike: bool = reshape_spike
 
     def get_train_dataset(self) -> EventDataset:
         return EventDataset(
@@ -39,6 +41,7 @@ class GenericEventDataset:
             self.sampling_time,
             self.sample_length,
             self.num_classes,
+            self.reshape_spike,
         )
 
     def get_test_dataset(self) -> EventDataset:
@@ -49,4 +52,5 @@ class GenericEventDataset:
             self.sampling_time,
             self.sample_length,
             self.num_classes,
+            self.reshape_spike,
         )
