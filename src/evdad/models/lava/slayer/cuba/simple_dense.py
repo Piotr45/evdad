@@ -36,12 +36,18 @@ class SimpleDense(torch.nn.Module):
         self.blocks = torch.nn.ModuleList(
             [
                 slayer.block.cuba.Dense(
-                    neuron_params_drop, H * W * C, 512, weight_norm=True, delay=True
+                    neuron_params_drop, H * W * C, 128, weight_norm=True, delay=True
                 ),
                 slayer.block.cuba.Dense(
-                    neuron_params_drop, 512, 512, weight_norm=True, delay=True
+                    neuron_params_drop, 128, 64, weight_norm=True, delay=True
                 ),
-                slayer.block.cuba.Dense(neuron_params, 512, 3, weight_norm=True),
+                slayer.block.cuba.Dense(
+                    neuron_params_drop, 64, 32, weight_norm=True, delay=True
+                ),
+                slayer.block.cuba.Dense(
+                    neuron_params_drop, 32, 16, weight_norm=True, delay=True
+                ),
+                slayer.block.cuba.Dense(neuron_params, 16, 3, weight_norm=True),
             ]
         )
 

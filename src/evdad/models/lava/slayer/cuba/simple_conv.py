@@ -39,12 +39,13 @@ class SimpleConv(torch.nn.Module):
 
         self.blocks = torch.nn.ModuleList(
             [
+                slayer.block.cuba.Input(neuron_params),
                 slayer.block.cuba.Conv(
                     sdnn_cnn_params,
                     C,
                     16,
-                    5,
-                    padding=0,
+                    3,
+                    padding=1,
                     stride=2,
                     weight_scale=2,
                     weight_norm=True,
@@ -53,7 +54,7 @@ class SimpleConv(torch.nn.Module):
                 slayer.block.cuba.Conv(
                     sdnn_cnn_params,
                     16,
-                    32,
+                    16,
                     3,
                     padding=0,
                     stride=2,
@@ -72,7 +73,7 @@ class SimpleConv(torch.nn.Module):
                 ),
                 slayer.block.cuba.Flatten(),
                 slayer.block.cuba.Dense(
-                    sdnn_dense_params, 44032, 258, weight_norm=True, delay=True
+                    sdnn_dense_params, 512, 258, weight_norm=True, delay=True
                 ),
                 slayer.block.cuba.Dense(
                     sdnn_dense_params, 258, 258, weight_norm=True, delay=True
