@@ -1,4 +1,4 @@
-_target_: evdad.models.lava.slayer.cuba.simple_dense.SimpleDense
+_target_: evdad.models.lava.slayer.cuba.resnet18.ResNet18
 
 threshold: 1.25
 current_decay: 0.30
@@ -8,6 +8,6 @@ scale_grad: 3
 requires_grad: false
 
 C: 2
-H: 256
-W: 256
+H: 260
+W: 346
 T: 30

@@ -1,5 +1,4 @@
 defaults:
-  - mlflow: local
   - config
   - _self_
 
@@ -7,11 +6,11 @@ dataset: null
 model: null
 
 dataloader:
-  batch_size: 2
+  batch_size: 128
 
 optimizer:
   type: adam
-  lr: 0.001
+  lr: 0.005
 
 loss:
   loss_function: SpikeRate
@@ -20,4 +19,4 @@ loss:
   reduction: sum
 
 training:
-  epochs: 10
+  epochs: 100

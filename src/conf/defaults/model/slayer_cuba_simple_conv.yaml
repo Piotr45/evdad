@@ -10,4 +10,4 @@ requires_grad: false
 C: 2
 H: 260
 W: 346
-T: 300
+T: 30
