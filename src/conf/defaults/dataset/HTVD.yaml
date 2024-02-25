@@ -1,9 +1,9 @@
 _target_: evdad.data.dataset.generic_event_dataset.GenericEventDataset
 
-train_data: /mnt/d/AI/SNN/Datasets/Highway_Traffic_Videos_Dataset_Slomo_Clean_Noise_30_mod10/train.csv
-train_labels: /mnt/d/AI/SNN/Datasets/Highway_Traffic_Videos_Dataset_Slomo_Clean_Noise_30_mod10/train_labels.csv
-test_data: /mnt/d/AI/SNN/Datasets/Highway_Traffic_Videos_Dataset_Slomo_Clean_Noise_30_mod10/test.csv
-test_labels: /mnt/d/AI/SNN/Datasets/Highway_Traffic_Videos_Dataset_Slomo_Clean_Noise_30_mod10/test_labels.csv
+train_data: /mnt/d/AI/SNN/Datasets/Highway_Traffic_Videos_Dataset_Slomo_Clean_Noise_30/train.csv
+train_labels: /mnt/d/AI/SNN/Datasets/Highway_Traffic_Videos_Dataset_Slomo_Clean_Noise_30/train_labels.csv
+test_data: /mnt/d/AI/SNN/Datasets/Highway_Traffic_Videos_Dataset_Slomo_Clean_Noise_30/test.csv
+test_labels: /mnt/d/AI/SNN/Datasets/Highway_Traffic_Videos_Dataset_Slomo_Clean_Noise_30/test_labels.csv
 
 img_shape: [256, 256] # HW
 sampling_time: 1
