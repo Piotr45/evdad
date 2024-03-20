@@ -1,5 +1,7 @@
 """Event-driven Dataset class"""
 
+import os
+
 import lava.lib.dl.slayer as slayer
 import numpy as np
 import torch
@@ -32,7 +34,7 @@ class EventDataset(Dataset):
         self.reshape_spike: bool = reshape_spike
 
         self.num_classes: int = num_classes
-        self.labels: dict = {"light": 0, "medium": 1, "heavy": 2}
+        # self.labels: dict = {"light": 0, "medium": 1, "heavy": 2}
 
         self._data: list = read_csv(data_csv)
         self._labels: list = read_csv(labels_csv)
@@ -42,21 +44,24 @@ class EventDataset(Dataset):
 
     def __getitem__(self, index: int) -> tuple:
         """Gets data and label from dataset"""
-        label = self.read_label(self._labels[index])
+        labels = self._read_label(self._labels[index])
         # event = slayer.io.read_2d_spikes(self._data[index])
         # spike = event.to_tensor()#[:, :, :, int(self._data[index][1]):int(self._data[index][2])]
+
         spike = np.load(self._data[index])
         spike = torch.from_numpy(spike)
-        zeros = torch.zeros((2, 256, 256, 30))
-        zeros[
-            : spike.shape[0], : spike.shape[1], : spike.shape[2], : spike.shape[3]
-        ] = spike
+        # print(spike.shape, self._data[index])
+        # zeros = torch.zeros((2, 256, 256, 1))
+        # zeros[: spike.shape[0], : spike.shape[1], : spike.shape[2], : spike.shape[3]] = spike
+        # zeros = zeros[:, :, :, 0]
+
         if self.reshape_spike:
-            return zeros.reshape(-1, self.num_time_bins), self.labels[label]
-        return zeros, self.labels[label]
+            return spike.reshape(-1, 1), labels
+        #     return zeros.reshape(-1, spike.shape[-1]), labels
+        return spike, labels
 
     @staticmethod
-    def read_label(path: str) -> str:
+    def _read_label(path: str) -> str:
         """Funtion that reads label file.
 
         Args:
@@ -66,4 +71,6 @@ class EventDataset(Dataset):
             Label in the desired form
         """
         # TODO change it in the future
-        return read_label_csv(path)[0]
+        # return read_label_csv(path)[0]
+        return 0
+        # return np.load(path)

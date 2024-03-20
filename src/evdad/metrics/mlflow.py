@@ -30,9 +30,7 @@ class MlflowHandler:
         self.tags: dict = tags
 
         self.client: MlflowClient = MlflowClient(self.mlflow_url)
-        self.experiment_id: int = self._get_or_create_experiment_id(
-            self.experiment_name
-        )
+        self.experiment_id: int = self._get_or_create_experiment_id(self.experiment_name)
         self.run: Run | None = None
 
     @property
@@ -42,9 +40,7 @@ class MlflowHandler:
 
     def _create_run(self) -> Run:
         """Create Mlflow run."""
-        return self.client.create_run(
-            self.experiment_id, tags=self.tags, run_name=self.run_name
-        )
+        return self.client.create_run(self.experiment_id, tags=self.tags, run_name=self.run_name)
 
     def run_experiment(self) -> None:
         """Start the run in Mlflow."""
@@ -66,6 +62,13 @@ class MlflowHandler:
         """Logs param to Mlflow."""
         try:
             self.client.log_param(self.run_id, param, value)
+        except mlflow.exceptions.MlflowException:
+            pass
+
+    def log_artifact(self, local_path: str, artifact_path: Any | None = None) -> None:
+        """Logs artifact to Mlflow."""
+        try:
+            self.client.log_artifact(self.run_id, local_path, artifact_path)
         except mlflow.exceptions.MlflowException:
             pass
 

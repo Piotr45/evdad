@@ -1,17 +1,15 @@
 """Event-driven Dataset class"""
 
-from evdad.data.dataset.event_dataset import EventDataset
+from evdad.data.dataset.nmnist_dataset import NMNISTDataset
 
 
-class GenericEventDataset:
-    """Event-driven dataset."""
+class GenericNMNISTDataset:
+    """Event-driven NMNIST dataset."""
 
     def __init__(
         self,
         train_data: str,
-        train_labels: str,
         test_data: str,
-        test_labels: str,
         img_shape: tuple[int, int],
         sampling_time: int,
         sample_length: int,
@@ -21,9 +19,7 @@ class GenericEventDataset:
     ) -> None:
         # Paths
         self.train_data: str = train_data
-        self.train_labels: str = train_labels
         self.test_data: str = test_data
-        self.test_labels: str = test_labels
 
         # Data properties
         self.img_shape: tuple = img_shape
@@ -35,10 +31,9 @@ class GenericEventDataset:
         self.reshape_spike: bool = reshape_spike
         self.data_is_label: bool = data_is_label
 
-    def get_train_dataset(self) -> EventDataset:
-        return EventDataset(
+    def get_train_dataset(self) -> NMNISTDataset:
+        return NMNISTDataset(
             self.train_data,
-            self.train_labels,
             self.img_shape,
             self.sampling_time,
             self.sample_length,
@@ -47,10 +42,9 @@ class GenericEventDataset:
             self.data_is_label,
         )
 
-    def get_test_dataset(self) -> EventDataset:
-        return EventDataset(
+    def get_test_dataset(self) -> NMNISTDataset:
+        return NMNISTDataset(
             self.test_data,
-            self.test_labels,
             self.img_shape,
             self.sampling_time,
             self.sample_length,
