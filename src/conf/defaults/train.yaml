@@ -1,5 +1,4 @@
 defaults:
-  - config
   - _self_
 
 dataset: null
@@ -10,7 +9,8 @@ dataloader:
 
 optimizer:
   type: adam
-  lr: 0.005
+  lr: 0.001
+  weight_decay: 1e-5
 
 loss:
   loss_function: SpikeRate
@@ -20,3 +20,4 @@ loss:
 
 training:
   epochs: 100
+  skip_test: true

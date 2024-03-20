@@ -1,0 +1,13 @@
+_target_: evdad.models.lava.slayer.cuba.cnn_autoencoder.CNNAutoEncoder
+
+threshold: 0.1
+current_decay: 0.9
+voltage_decay: 0.9
+tau_grad: 1
+scale_grad: 1
+requires_grad: True
+
+C: 2
+H: 180
+W: 240
+T: 30

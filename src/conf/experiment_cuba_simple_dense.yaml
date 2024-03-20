@@ -15,3 +15,10 @@ training:
 
 dataset:
   reshape_spike: true
+
+hydra:
+  job:
+    chdir: true
+  searchpath:
+    - file:///${oc.env:HOME}/evdad/src/conf/defaults
+    # - file:///${oc.env:HOME}/evdad/src/conf/experiemnts

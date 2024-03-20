@@ -1,0 +1,27 @@
+defaults:
+  - mlflow: local
+  - train
+  - dataset: UCSD
+  - model: slayer_cuba_cnn_autoencoder
+  - _self_
+  
+mlflow:
+  experiment_name: SLAYER
+  run_name: slayer_cuba_cnn_autoencoder
+  tags: {version: 0.1.0}
+
+training:
+  epochs: 100
+
+dataset:
+  data_is_label: true
+
+dataloader:
+  batch_size: 64
+
+hydra:
+  job:
+    chdir: true
+  searchpath:
+    - file:///${oc.env:HOME}/evdad/src/conf/defaults
+    # - file:///${oc.env:HOME}/evdad/src/conf/experiemnts

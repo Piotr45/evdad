@@ -1,0 +1,12 @@
+_target_: evdad.data.dataset.generic_event_dataset.GenericEventDataset
+
+train_data: /mnt/d/AI/SNN/Datasets/UCSD_Anomaly_Dataset/UCSD_Anomaly_Event_Dataset/train.csv
+train_labels: /mnt/d/AI/SNN/Datasets/UCSD_Anomaly_Dataset/UCSD_Anomaly_Event_Dataset/train_labels.csv
+test_data: /mnt/d/AI/SNN/Datasets/UCSD_Anomaly_Dataset/UCSD_Anomaly_Event_Dataset/test.csv
+test_labels: /mnt/d/AI/SNN/Datasets/UCSD_Anomaly_Dataset/UCSD_Anomaly_Event_Dataset/test_labels.csv
+
+img_shape: [180, 240] # HW
+sampling_time: 1
+sample_length: 30
+
+num_classes: 2

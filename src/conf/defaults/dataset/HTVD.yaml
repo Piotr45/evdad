@@ -8,6 +8,5 @@ test_labels: /mnt/d/AI/SNN/Datasets/Highway_Traffic_Videos_Dataset_Slomo_Clean_N
 img_shape: [256, 256] # HW
 sampling_time: 1
 sample_length: 30
-reshape_spike: false
 
 num_classes: 3
