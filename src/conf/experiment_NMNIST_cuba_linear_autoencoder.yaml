@@ -2,12 +2,12 @@ defaults:
   - mlflow: local
   - train
   - dataset: NMNIST
-  - model: slayer_cuba_NMNIST_linear_autoencoder
+  - model: slayer_cuba_linear_autoencoder
   - _self_
   
 mlflow:
   experiment_name: SLAYER
-  run_name: slayer_cuba_linear_autoencoder
+  run_name: slayer_cuba_NMNIST_linear_autoencoder
   tags: {version: 0.1.0}
 
 training:

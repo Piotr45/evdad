@@ -32,15 +32,9 @@ class Network(torch.nn.Module):
             [
                 # enable affine transform at input
                 bootstrap.block.cuba.Input(neuron_params, weight=1, bias=0),
-                bootstrap.block.cuba.Dense(
-                    neuron_params_drop, 28 * 28, 512, weight_norm=True, weight_scale=2
-                ),
-                bootstrap.block.cuba.Dense(
-                    neuron_params_drop, 512, 512, weight_norm=True, weight_scale=2
-                ),
-                bootstrap.block.cuba.Affine(
-                    neuron_params, 512, 10, weight_norm=True, weight_scale=2
-                ),
+                bootstrap.block.cuba.Dense(neuron_params_drop, 28 * 28, 512, weight_norm=True, weight_scale=2),
+                bootstrap.block.cuba.Dense(neuron_params_drop, 512, 512, weight_norm=True, weight_scale=2),
+                bootstrap.block.cuba.Affine(neuron_params, 512, 10, weight_norm=True, weight_scale=2),
             ]
         )
 

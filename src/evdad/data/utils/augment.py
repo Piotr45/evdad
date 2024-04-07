@@ -6,9 +6,7 @@ import numpy as np
 import torch
 
 
-def augment_events(
-    event: slayer.io.Event, x_shift: int = 4, y_shift: int = 4, theta: int = 10
-) -> slayer.io.Event:
+def augment_events(event: slayer.io.Event, x_shift: int = 4, y_shift: int = 4, theta: int = 10) -> slayer.io.Event:
     """TODO"""
     xjitter = np.random.randint(2 * x_shift) - x_shift
     yjitter = np.random.randint(2 * y_shift) - y_shift
