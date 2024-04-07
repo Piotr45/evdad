@@ -1,0 +1,18 @@
+defaults:
+  - mlflow: local
+  - train
+  - dataset: HTVD
+  - model: slayer_cuba_simple_conv
+  - _self_
+
+mlflow:
+  experiment_name: SLAYER
+  run_name: slayer_cuba_simple_conv
+  tags: {version: 0.1.0}
+
+hydra:
+  job:
+    chdir: true
+  searchpath:
+    - file:///${oc.env:HOME}/evdad/src/conf/defaults
+    # - file:///${oc.env:HOME}/evdad/src/conf/experiemnts

@@ -1,0 +1,23 @@
+defaults:
+  - _self_
+
+dataset: null
+model: null
+
+dataloader:
+  batch_size: 128
+
+optimizer:
+  type: adam
+  lr: 0.001
+  weight_decay: 1e-5
+
+loss:
+  loss_function: SpikeRate
+  true_rate: 0.2
+  false_rate: 0.03
+  reduction: sum
+
+training:
+  epochs: 100
+  skip_test: true
