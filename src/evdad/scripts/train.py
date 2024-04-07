@@ -10,7 +10,7 @@ import tqdm
 from omegaconf import DictConfig, OmegaConf
 from torch.utils.data import DataLoader
 
-from evdad.trainer.loss import get_loss_function
+from evdad.trainer.loss import get_classifier, get_loss_function
 from evdad.trainer.optimizer import get_optimizer
 from evdad.utils import get_device, get_hydra_dir_path, get_logger_path
 
@@ -19,9 +19,13 @@ log = logging.getLogger(__name__)
 
 def save_new_checkpoint(net: torch.nn.Module, epoch: int) -> None:
     """Saves new checkpoint and removes previous one."""
-    torch.save(net.state_dict(), os.path.join(get_hydra_dir_path(), f"checkpoint_{epoch}.pt"))
+    torch.save(
+        net.state_dict(), os.path.join(get_hydra_dir_path(), f"checkpoint_{epoch}.pt")
+    )
 
-    last_checkpoint_path = os.path.join(get_hydra_dir_path(), f"checkpoint_{epoch-1}.pt")
+    last_checkpoint_path = os.path.join(
+        get_hydra_dir_path(), f"checkpoint_{epoch-1}.pt"
+    )
     if os.path.exists(last_checkpoint_path):
         os.remove(last_checkpoint_path)
 
@@ -43,11 +47,23 @@ def main(cfg: DictConfig) -> None:
     skip_test = cfg["training"]["skip_test"]
 
     train = dataset.get_train_dataset()
-    train_loader = DataLoader(dataset=train, batch_size=batch_size, shuffle=True, num_workers=4, prefetch_factor=2)
+    train_loader = DataLoader(
+        dataset=train,
+        batch_size=batch_size,
+        shuffle=True,
+        num_workers=4,
+        prefetch_factor=2,
+    )
 
     if not skip_test:
         test = dataset.get_test_dataset()
-        test_loader = DataLoader(dataset=test, batch_size=batch_size, shuffle=True, num_workers=0, prefetch_factor=0)
+        test_loader = DataLoader(
+            dataset=test,
+            batch_size=batch_size,
+            shuffle=True,
+            num_workers=0,
+            prefetch_factor=0,
+        )
 
     net = hydra.utils.instantiate(cfg["model"]).to(device)
 
@@ -61,8 +77,8 @@ def main(cfg: DictConfig) -> None:
         error=error,
         optimizer=optimizer,
         stats=stats,
-        # error=lambda output, target: torch.nn.functional.mse_loss(output, target),
-        # classifier=slayer.classifier.Rate.predict,
+        classifier=get_classifier(),
+        count_log=True,
     )
 
     mlflow_logger = hydra.utils.instantiate(cfg["mlflow"])
@@ -81,27 +97,49 @@ def main(cfg: DictConfig) -> None:
         desc="Epochs",
     ):
         for i, (input, target) in enumerate(train_loader):  # training loop
-            output = assistant.train(
+            _, count = assistant.train(
                 input.to(device, dtype=torch.float),
                 target.to(device, dtype=torch.float),
             )
-            stats.print(epoch, iter=i, dataloader=train_loader)
+            header = [
+                "Event rate: "
+                + ", ".join([f"{c.item():.4f}" for c in count.flatten()])
+            ]
+            stats.print(epoch, iter=i, dataloader=train_loader, header=header)
+
+        log.info(
+            f"Epoch: {epoch}\tTraining loss: {stats.training.loss}\tTraining accuracy: {stats.training.accuracy}\t{header}"
+        )
 
         mlflow_logger.log_metric("training_loss", stats.training.loss, step=epoch)
-        mlflow_logger.log_metric("training_accuracy", stats.training.accuracy, step=epoch)
+        mlflow_logger.log_metric(
+            "training_accuracy", stats.training.accuracy, step=epoch
+        )
 
         if not skip_test:
             for i, (input, target) in enumerate(test_loader):  # test loop
-                output = assistant.test(input.to(device, dtype=torch.float), target.to(device, dtype=torch.float))
+                _, count = assistant.test(
+                    input.to(device, dtype=torch.float),
+                    target.to(device, dtype=torch.float),
+                )
                 stats.print(epoch, iter=i, dataloader=test_loader)
 
+            log.info(
+                f"Epoch: {epoch}\tTest loss: {stats.training.loss}\tTest accuracy: {stats.training.accuracy}"
+            )
+
             mlflow_logger.log_metric("test_loss", stats.testing.loss, step=epoch)
-            mlflow_logger.log_metric("test_accuracy", stats.testing.accuracy, step=epoch)
+            mlflow_logger.log_metric(
+                "test_accuracy", stats.testing.accuracy, step=epoch
+            )
 
         save_new_checkpoint(net, epoch)
 
         if stats.training.best_loss:
-            torch.save(net.state_dict(), os.path.join(get_hydra_dir_path(), "checkpoint_best.pt"))
+            torch.save(
+                net.state_dict(),
+                os.path.join(get_hydra_dir_path(), "checkpoint_best.pt"),
+            )
             # mlflow.pytorch.log_model(net, mlflow_logger.run_id) # TODO fix warnings
 
         mlflow_logger.log_artifact(get_logger_path("train.log"))

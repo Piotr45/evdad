@@ -2,7 +2,7 @@ defaults:
   - mlflow: local
   - train
   - dataset: NMNIST
-  - model: slayer_cuba_NMNIST_linear_autoencoder
+  - model: slayer_cuba_linear_autoencoder
   - _self_
   
 mlflow:
@@ -11,23 +11,10 @@ mlflow:
   tags: {version: 0.1.0}
 
 training:
-  epochs: 200
+  epochs: 100
 
 dataset:
   reshape_spike: true
-  data_is_label: true
-
-loss:
-  loss_function: SpikeTime
-  time_constant: 1
-  length: 1
-  filter_order: 2
-  reduction: sum
-
-optimizer:
-  type: adamw
-  lr: 0.001
-  weight_decay: 1e-5
 
 dataloader:
   batch_size: 128

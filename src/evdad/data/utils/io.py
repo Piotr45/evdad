@@ -1,4 +1,4 @@
-"""Dataset utils module"""
+"""Dataset io utils module."""
 
 
 def read_csv(path: str) -> list:

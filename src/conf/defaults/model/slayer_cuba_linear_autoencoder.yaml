@@ -1,11 +1,11 @@
 _target_: evdad.models.lava.slayer.cuba.linear_autoencoder.LinearAutoEncoder
 
-threshold: 0.1
-current_decay: 0.9
-voltage_decay: 0.9
+threshold: 0.2
+current_decay: 1
+voltage_decay: 0.3
 tau_grad: 1
 scale_grad: 1
-requires_grad: True
+requires_grad: true
 
 C: 2
 H: 34

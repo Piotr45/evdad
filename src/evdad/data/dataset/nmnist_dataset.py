@@ -2,8 +2,11 @@ import glob
 import os
 
 import lava.lib.dl.slayer as slayer
+import numpy as np
 import torch
 from torch.utils.data import Dataset
+
+from evdad.data.utils.augment import augment_events
 
 
 class NMNISTDataset(Dataset):
@@ -40,13 +43,15 @@ class NMNISTDataset(Dataset):
 
         event = slayer.io.read_2d_spikes(filename)
 
+        event = augment_events(event)
+
         spike = event.fill_tensor(
             torch.zeros(2, self.img_shape[0], self.img_shape[1], self.num_time_bins),
             sampling_time=self.sampling_time,
         )
 
         if self.data_is_label:
-            label = spike.clone()
+            label = spike.detach().clone()
         else:
             label = os.path.basename(os.path.abspath(os.path.join(filename, os.pardir)))
 

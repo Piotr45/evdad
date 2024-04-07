@@ -72,8 +72,12 @@ class SimpleConv(torch.nn.Module):
                     delay=True,
                 ),
                 slayer.block.cuba.Flatten(),
-                slayer.block.cuba.Dense(sdnn_dense_params, 512, 258, weight_norm=True, delay=True),
-                slayer.block.cuba.Dense(sdnn_dense_params, 258, 258, weight_norm=True, delay=True),
+                slayer.block.cuba.Dense(
+                    sdnn_dense_params, 512, 258, weight_norm=True, delay=True
+                ),
+                slayer.block.cuba.Dense(
+                    sdnn_dense_params, 258, 258, weight_norm=True, delay=True
+                ),
                 slayer.block.cuba.Dense(sdnn_dense_params, 258, 3, weight_norm=True),
             ]
         )

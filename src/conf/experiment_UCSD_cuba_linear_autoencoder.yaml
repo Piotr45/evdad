@@ -7,7 +7,7 @@ defaults:
   
 mlflow:
   experiment_name: SLAYER
-  run_name: slayer_cuba_linear_autoencoder
+  run_name: slayer_cuba_UCSD_linear_autoencoder
   tags: {version: 0.1.0}
 
 training:

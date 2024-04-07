@@ -7,7 +7,7 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset
 
-from evdad.data.utils import read_csv, read_label_csv
+from evdad.data.utils.io import read_csv, read_label_csv
 
 
 class EventDataset(Dataset):
@@ -22,6 +22,7 @@ class EventDataset(Dataset):
         sample_length: int,
         num_classes: int,
         reshape_spike: bool,
+        data_is_label: bool = False,
     ) -> None:
         self.data_csv: str = data_csv
         self.labels_csv: str = labels_csv
@@ -32,6 +33,7 @@ class EventDataset(Dataset):
         self.num_time_bins: int = int(sample_length / sampling_time)
 
         self.reshape_spike: bool = reshape_spike
+        self.data_is_label: bool = data_is_label
 
         self.num_classes: int = num_classes
         # self.labels: dict = {"light": 0, "medium": 1, "heavy": 2}
@@ -48,7 +50,7 @@ class EventDataset(Dataset):
         # event = slayer.io.read_2d_spikes(self._data[index])
         # spike = event.to_tensor()#[:, :, :, int(self._data[index][1]):int(self._data[index][2])]
 
-        spike = np.load(self._data[index])
+        spike = np.load(self._data[index]).astype(np.float32)
         spike = torch.from_numpy(spike)
         # print(spike.shape, self._data[index])
         # zeros = torch.zeros((2, 256, 256, 1))

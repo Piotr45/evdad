@@ -1,4 +1,3 @@
-import lava
 import torch
 
 
@@ -18,5 +17,8 @@ def get_optimizer(cfg: dict, net: torch.nn.Module) -> torch.optim.Optimizer:
     if optim_type == "adam":
         weight_decay = cfg["optimizer"]["weight_decay"]
         return torch.optim.Adam(net.parameters(), lr=lr, weight_decay=weight_decay)
+    elif optim_type == "adamw":
+        weight_decay = cfg["optimizer"]["weight_decay"]
+        return torch.optim.AdamW(net.parameters(), lr=lr, weight_decay=weight_decay)
     else:
         raise NotImplementedError("This optimizer is not implemented")

@@ -7,11 +7,11 @@ defaults:
   
 mlflow:
   experiment_name: SLAYER
-  run_name: slayer_cuba_cnn_autoencoder
+  run_name: slayer_cuba_NMNIST_cnn_autoencoder
   tags: {version: 0.1.0}
 
 training:
-  epochs: 100
+  epochs: 5
 
 dataset:
   data_is_label: true

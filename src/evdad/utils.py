@@ -18,4 +18,6 @@ def get_logger_path(filename: str) -> str:
 
 def get_hydra_dir_path() -> str:
     """Gets hydra run dir path."""
-    return hydra.utils.to_absolute_path(hydra.core.hydra_config.HydraConfig.get().runtime.output_dir)
+    return hydra.utils.to_absolute_path(
+        hydra.core.hydra_config.HydraConfig.get().runtime.output_dir
+    )
