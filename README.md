@@ -8,15 +8,41 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Installing
 
-A step by step series of examples that tell you how to get a development env running
+A step by step series of examples that tell you how to get a development env running.
 
+#### [Linux]
+
+Clone the repo and create virtual environment.
+
+```bash
+cd $HOME
+git clone git@github.com:Piotr45/evdad.git evdad
+cd evdad
+python -m venv evdad-venv
+source evdad-venv/bin/activate
 ```
-TODO
+
+Install requirements.
+
+```bash
+pip install -r requirements.txt
+```
+
+Install EVDAD package.
+
+```bash
+pip install -e .
+hash -r
 ```
 
 ## Running the tests
 
 TODO if time
+
+## Tutorials
+
+- [End to end training tutorials](docs/tutorials/training/README.md)
+- [Inference Tutorial](docs/tutorials/training/README.md)
 
 ## Built With
 
@@ -34,7 +60,7 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 
 ## Authors
 
-- **Piotr Baryczkowski** - *Initial work* - [Piotr45](https://github.com/Piotr45)
+- **Piotr Baryczkowski** - *Initial work, framework maintenance* - [Piotr45](https://github.com/Piotr45)
 
 ## License
 
@@ -42,4 +68,4 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 ## Acknowledgments
 
-- Hat tip to creators of V2E and LAVA
+- Hat tip to creators of [V2E](https://sites.google.com/view/video2events/home) and [LAVA](https://lava-nc.org/index.html).
