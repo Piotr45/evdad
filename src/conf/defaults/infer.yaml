@@ -1,0 +1,8 @@
+defaults:
+  - _self_
+
+model: null
+
+processing:
+  checkpoint: null
+  input_dir: null

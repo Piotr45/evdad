@@ -10,6 +10,13 @@ mlflow:
   run_name: slayer_cuba_simple_conv
   tags: {version: 0.1.0}
 
+training:
+  epochs: 50
+  skip_test: false
+
+dataset:
+  reshape_spike: false
+
 hydra:
   job:
     chdir: true

@@ -1,19 +1,15 @@
 defaults:
-  - mlflow: local
-  - train
+  - infer
   - dataset: NMNIST
-  - model: slayer_cuba_cnn_autoencoder
+  - model: slayer_cuba_linear_autoencoder
   - _self_
-  
-mlflow:
-  experiment_name: SLAYER
-  run_name: slayer_cuba_NMNIST_cnn_autoencoder
-  tags: {version: 0.1.0}
 
-loss:
-  loss_function: MSE
+processing:
+  checkpoint: /home/piotr/evdad/outputs/train/NMNIST/2024-04-28_13-29/checkpoint_999.pt
+  input_dir: null
 
 dataset:
+  reshape_spike: true
   data_is_label: true
 
 hydra:
