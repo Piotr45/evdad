@@ -6,18 +6,18 @@ defaults:
   - _self_
   
 mlflow:
-  experiment_name: SLAYER
+  experiment_name: DEBUG
   run_name: slayer_cuba_UCSD_cnn_autoencoder
   tags: {version: 0.1.0}
 
-training:
-  epochs: 100
+loss:
+  loss_function: MSE
 
 dataset:
   data_is_label: true
 
 dataloader:
-  batch_size: 64
+  batch_size: 8
 
 hydra:
   job:

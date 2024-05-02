@@ -21,9 +21,14 @@ class CNNAutoEncoder(torch.nn.Module):
     ):
         super(CNNAutoEncoder, self).__init__()
 
+        self.C: int = C
+        self.H: int = H
+        self.W: int = W
+        self.T: int = T
+
         self.encoder = Encoder(
             C,
-            2,
+            32,
             threshold,
             current_decay,
             voltage_decay,
@@ -33,7 +38,7 @@ class CNNAutoEncoder(torch.nn.Module):
         )
         self.decoder = Decoder(
             C,
-            2,
+            32,
             threshold,
             current_decay,
             voltage_decay,
@@ -43,12 +48,15 @@ class CNNAutoEncoder(torch.nn.Module):
         )
 
     def forward(self, spike: torch.Tensor) -> torch.Tensor:
-        # print("encoder")
-        z = self.encoder(spike)
-        # print("between")
+        z, ec = self.encoder(spike)
         x_hat, c = self.decoder(z)
-        # print("xhat", x_hat.shape)
-        return x_hat, c
+
+        # TODO do it in model
+        N, C, H, W, T = x_hat.shape
+        zeros = torch.zeros((N, C, spike.shape[2], spike.shape[3], T))
+        zeros[:, :, :H, :W, :] = x_hat
+
+        return zeros.to("cuda"), torch.concat((ec, c), dim=1)
 
     def grad_flow(self) -> torch.Tensor:
         grad = [b.synapse.grad_norm for b in self.blocks if hasattr(b, "synapse")]
@@ -78,6 +86,8 @@ class Encoder(torch.nn.Module):
             "current_decay": current_decay,
             "voltage_decay": voltage_decay,
             "requires_grad": requires_grad,
+            "tau_grad": tau_grad,
+            "scale_grad": scale_grad,
         }
         neuron_params_drop = {
             **neuron_params,
@@ -85,27 +95,55 @@ class Encoder(torch.nn.Module):
         }
 
         c_hid = base_channel_size
+        weight_scale = 2
+        weight_norm = False
 
         self.blocks = torch.nn.ModuleList(
             [
                 slayer.block.cuba.Conv(
                     neuron_params_drop,
-                    C,
-                    c_hid,
-                    3,
+                    in_features=C,
+                    out_features=c_hid,
+                    kernel_size=3,
                     padding=1,
                     stride=2,
-                    weight_scale=2,
-                    weight_norm=True,
+                    weight_scale=weight_scale,
+                    weight_norm=weight_norm,
+                    delay=True,
+                ),
+                slayer.block.cuba.Conv(
+                    neuron_params_drop,
+                    in_features=c_hid,
+                    out_features=c_hid * 2,
+                    kernel_size=3,
+                    padding=1,
+                    stride=2,
+                    weight_scale=weight_scale,
+                    weight_norm=weight_norm,
+                    delay=True,
+                ),
+                slayer.block.cuba.Conv(
+                    neuron_params_drop,
+                    in_features=c_hid * 2,
+                    out_features=c_hid * 4,
+                    kernel_size=3,
+                    padding=1,
+                    stride=2,
+                    weight_scale=weight_scale,
+                    weight_norm=weight_norm,
                     delay=True,
                 ),
             ]
         )
 
     def forward(self, spike: torch.Tensor) -> torch.Tensor:
+        count = []
+
         for block in self.blocks:
             spike = block(spike)
-        return spike
+            count.append(torch.mean(spike).item())
+
+        return spike, torch.FloatTensor(count).reshape((1, -1)).to(spike.device)
 
 
 class Decoder(torch.nn.Module):
@@ -127,6 +165,8 @@ class Decoder(torch.nn.Module):
             "current_decay": current_decay,
             "voltage_decay": voltage_decay,
             "requires_grad": requires_grad,
+            "tau_grad": tau_grad,
+            "scale_grad": scale_grad,
         }
         neuron_params_drop = {
             **neuron_params,
@@ -134,32 +174,43 @@ class Decoder(torch.nn.Module):
         }
 
         c_hid = base_channel_size
-        weight_scale = 1
+        weight_scale = 2
+        weight_norm = False
 
         self.blocks = torch.nn.ModuleList(
             [
                 slayer.block.cuba.ConvT(
                     neuron_params_drop,
-                    c_hid,
-                    C,
-                    3,
-                    padding=0,
+                    in_features=c_hid * 4,
+                    out_features=c_hid * 2,
+                    kernel_size=3,
+                    padding=1,
                     stride=2,
                     weight_scale=weight_scale,
-                    weight_norm=True,
-                    delay=False,
-                    # dilation=0,
+                    weight_norm=weight_norm,
+                    delay=True,
                 ),
-                slayer.block.cuba.Conv(
+                slayer.block.cuba.ConvT(
                     neuron_params_drop,
-                    C,
-                    C,
-                    2,
-                    padding=0,
-                    stride=1,
+                    in_features=c_hid * 2,
+                    out_features=c_hid,
+                    kernel_size=3,
+                    padding=1,
+                    stride=2,
                     weight_scale=weight_scale,
-                    weight_norm=False,
-                    delay=False,
+                    weight_norm=weight_norm,
+                    delay=True,
+                ),
+                slayer.block.cuba.ConvT(
+                    neuron_params_drop,
+                    in_features=c_hid,
+                    out_features=C,
+                    kernel_size=3,
+                    padding=1,
+                    stride=2,
+                    weight_scale=weight_scale,
+                    weight_norm=weight_norm,
+                    delay=True,
                 ),
             ]
         )

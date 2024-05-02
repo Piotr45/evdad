@@ -36,7 +36,7 @@ class EventDataset(Dataset):
         self.data_is_label: bool = data_is_label
 
         self.num_classes: int = num_classes
-        # self.labels: dict = {"light": 0, "medium": 1, "heavy": 2}
+        self.labels: dict = {"light": 0, "medium": 1, "heavy": 2}
 
         self._data: list = read_csv(data_csv)
         self._labels: list = read_csv(labels_csv)
@@ -47,23 +47,25 @@ class EventDataset(Dataset):
     def __getitem__(self, index: int) -> tuple:
         """Gets data and label from dataset"""
         labels = self._read_label(self._labels[index])
-        # event = slayer.io.read_2d_spikes(self._data[index])
-        # spike = event.to_tensor()#[:, :, :, int(self._data[index][1]):int(self._data[index][2])]
 
         spike = np.load(self._data[index]).astype(np.float32)
         spike = torch.from_numpy(spike)
-        # print(spike.shape, self._data[index])
-        # zeros = torch.zeros((2, 256, 256, 1))
-        # zeros[: spike.shape[0], : spike.shape[1], : spike.shape[2], : spike.shape[3]] = spike
-        # zeros = zeros[:, :, :, 0]
+
+        if self.data_is_label:
+            label = spike.detach().clone()
+        else:
+            # label = labels
+            label = self.labels[labels]
 
         if self.reshape_spike:
-            return spike.reshape(-1, 1), labels
-        #     return zeros.reshape(-1, spike.shape[-1]), labels
-        return spike, labels
+            return (
+                spike.reshape(-1, self.num_time_bins),
+                label.reshape(-1, self.num_time_bins) if self.data_is_label else label,
+            )
+        return spike, label
 
-    @staticmethod
-    def _read_label(path: str) -> str:
+    # @staticmethod
+    def _read_label(self, path: str) -> str:
         """Funtion that reads label file.
 
         Args:
@@ -73,6 +75,5 @@ class EventDataset(Dataset):
             Label in the desired form
         """
         # TODO change it in the future
-        # return read_label_csv(path)[0]
-        return 0
-        # return np.load(path)
+        return read_label_csv(path)[0]
+        return torch.tensor([self.labels[label] for label in read_label_csv(path)], dtype=torch.long)

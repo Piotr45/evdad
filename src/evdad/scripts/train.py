@@ -18,9 +18,10 @@ from evdad.utils import get_device, get_hydra_dir_path, get_logger_path
 log = logging.getLogger(__name__)
 
 
-def save_new_checkpoint(net: torch.nn.Module, epoch: int) -> None:
+def save_new_checkpoint(net: torch.nn.Module, epoch: int, run_id: str) -> None:
     """Saves new checkpoint and removes previous one."""
-    torch.save(net.state_dict(), os.path.join(get_hydra_dir_path(), f"checkpoint_{epoch}.pt"))
+    checkpoint_data = {"checkpoint": net.state_dict(), "epoch": epoch, "run_id": run_id}
+    torch.save(checkpoint_data, os.path.join(get_hydra_dir_path(), f"checkpoint_{epoch}.pt"))
 
     last_checkpoint_path = os.path.join(get_hydra_dir_path(), f"checkpoint_{epoch-1}.pt")
     if os.path.exists(last_checkpoint_path):
@@ -58,8 +59,8 @@ def main(cfg: DictConfig) -> None:
             dataset=test,
             batch_size=batch_size,
             shuffle=True,
-            num_workers=0,
-            prefetch_factor=0,
+            num_workers=4,
+            prefetch_factor=2,
         )
 
     net = hydra.utils.instantiate(cfg["model"]).to(device)
@@ -90,20 +91,20 @@ def main(cfg: DictConfig) -> None:
 
     torch.cuda.empty_cache()
     for epoch in tqdm.tqdm(
-        range(epochs),
+        range(1, epochs + 1),
         desc="Epochs",
     ):
         for i, (input, target) in enumerate(train_loader):  # training loop
             _, count = assistant.train(
                 input.to(device, dtype=torch.float),
-                target.to(device, dtype=torch.float),
+                target,  # target.to(device, dtype=torch.float),
             )
             header = ["Event rate: " + ", ".join([f"{c.item():.4f}" for c in count.flatten()])]
             stats.print(epoch, iter=i, dataloader=train_loader, header=header)
 
-        log.info(
-            f"Epoch: {epoch}\tTraining loss: {stats.training.loss}\tTraining accuracy: {stats.training.accuracy}\t{header[0]}"
-        )
+        # log.info(
+        #     f"Epoch: {epoch}\tTraining loss: {stats.training.loss}\tTraining accuracy: {stats.training.accuracy}\t{header[0]}\tEvent input: {torch.mean(target).item()}"
+        # )
 
         mlflow_logger.log_metric("training_loss", stats.training.loss, step=epoch)
         mlflow_logger.log_metric("training_accuracy", stats.training.accuracy, step=epoch)
@@ -112,20 +113,21 @@ def main(cfg: DictConfig) -> None:
             for i, (input, target) in enumerate(test_loader):  # test loop
                 _, count = assistant.test(
                     input.to(device, dtype=torch.float),
-                    target.to(device, dtype=torch.float),
+                    target,  # target.to(device, dtype=torch.float),
                 )
                 stats.print(epoch, iter=i, dataloader=test_loader)
 
-            log.info(f"Epoch: {epoch}\tTest loss: {stats.training.loss}\tTest accuracy: {stats.training.accuracy}")
+            # log.info(f"Epoch: {epoch}\tTest loss: {stats.testing.loss}\tTest accuracy: {stats.testing.accuracy}")
 
             mlflow_logger.log_metric("test_loss", stats.testing.loss, step=epoch)
             mlflow_logger.log_metric("test_accuracy", stats.testing.accuracy, step=epoch)
 
-        save_new_checkpoint(net, epoch)
+        save_new_checkpoint(net, epoch, mlflow_logger.run_id())
 
-        if stats.training.best_loss:
+        if stats.testing.best_accuracy:
+            checkpoint_data = {"checkpoint": net.state_dict(), "epoch": epoch, "run_id": mlflow_logger.run_id()}
             torch.save(
-                net.state_dict(),
+                checkpoint_data,
                 os.path.join(get_hydra_dir_path(), "checkpoint_best.pt"),
             )
             # mlflow.pytorch.log_model(net, mlflow_logger.run_id) # TODO fix warnings

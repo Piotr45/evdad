@@ -20,6 +20,11 @@ class SimpleConv(torch.nn.Module):
     ):
         super(SimpleConv, self).__init__()
 
+        self.C: int = C
+        self.H: int = H
+        self.W: int = W
+        self.T: int = T
+
         neuron_params = {
             "threshold": threshold,
             "current_decay": current_decay,
@@ -30,11 +35,11 @@ class SimpleConv(torch.nn.Module):
         }
         sdnn_cnn_params = {  # conv layer has additional mean only batch norm
             **neuron_params,  # copy all sdnn_params
-            "norm": slayer.neuron.norm.MeanOnlyBatchNorm,  # mean only quantized batch normalizaton
+            # "norm": slayer.neuron.norm.MeanOnlyBatchNorm,  # mean only quantized batch normalizaton
         }
         sdnn_dense_params = {  # dense layers have additional dropout units enabled
             **sdnn_cnn_params,  # copy all sdnn_cnn_params
-            "dropout": slayer.neuron.Dropout(p=0.2),  # neuron dropout
+            "dropout": slayer.neuron.Dropout(p=0.05),  # neuron dropout
         }
 
         self.blocks = torch.nn.ModuleList(
@@ -54,34 +59,39 @@ class SimpleConv(torch.nn.Module):
                 slayer.block.cuba.Conv(
                     sdnn_cnn_params,
                     16,
-                    16,
+                    32,
                     3,
-                    padding=0,
+                    padding=1,
                     stride=2,
                     weight_scale=2,
                     weight_norm=True,
                     delay=True,
                 ),
-                slayer.block.cuba.Pool(
+                slayer.block.cuba.Conv(
                     sdnn_cnn_params,
-                    2,
-                    padding=0,
+                    32,
+                    64,
+                    3,
+                    padding=1,
                     stride=2,
                     weight_scale=2,
                     weight_norm=True,
                     delay=True,
                 ),
                 slayer.block.cuba.Flatten(),
-                slayer.block.cuba.Dense(sdnn_dense_params, 512, 258, weight_norm=True, delay=True),
-                slayer.block.cuba.Dense(sdnn_dense_params, 258, 258, weight_norm=True, delay=True),
-                slayer.block.cuba.Dense(sdnn_dense_params, 258, 3, weight_norm=True),
+                slayer.block.cuba.Dense(sdnn_dense_params, 16384, 128, weight_norm=True, delay=True),
+                slayer.block.cuba.Affine(neuron_params, 128, 3, weight_norm=True),
             ]
         )
 
     def forward(self, spike):
+        count = []
+
         for block in self.blocks:
             spike = block(spike)
-        return spike
+            count.append(torch.mean(spike).item())
+
+        return spike, torch.FloatTensor(count).reshape((1, -1)).to(spike.device)
 
     def grad_flow(self, path):
         grad = [b.synapse.grad_norm for b in self.blocks if hasattr(b, "synapse")]

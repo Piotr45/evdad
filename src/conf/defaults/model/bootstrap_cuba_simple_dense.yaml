@@ -1,4 +1,4 @@
-_target_: evdad.models.lava.slayer.cuba.simple_conv.SimpleConv
+_target_: evdad.models.lava.bootstrap.cuba.simple_dense.SimpleDense
 
 threshold: 1.25
 current_decay: 0.3
