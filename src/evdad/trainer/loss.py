@@ -1,5 +1,11 @@
+import logging
+
 import lava.lib.dl.slayer as slayer
 import torch
+
+log = logging.getLogger(__name__)
+
+REDUCTION = "sum"
 
 
 def get_loss_function(cfg: dict, device: str) -> torch.nn.Module:
@@ -37,7 +43,11 @@ def get_loss_function(cfg: dict, device: str) -> torch.nn.Module:
             reduction=reduction,
         ).to(device)
     elif loss_function == "MSE":
-        reduction = cfg["loss"]["reduction"] if "reduction" in list(cfg["loss"].keys()) else "sum"
-        return (lambda output, target: torch.nn.functional.mse_loss(output, target, reduction=reduction),)
+        REDUCTION = cfg["loss"]["reduction"] if "reduction" in list(cfg["loss"].keys()) else "sum"
+        return custom_mse
     else:
         raise NotImplementedError("This function is not implemented or does not exist.")
+
+
+def custom_mse(output, target, reduction: str = REDUCTION):
+    return torch.nn.functional.mse_loss(output, target, reduction=reduction)
