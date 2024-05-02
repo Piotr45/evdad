@@ -45,9 +45,15 @@ def get_loss_function(cfg: dict, device: str) -> torch.nn.Module:
     elif loss_function == "MSE":
         REDUCTION = cfg["loss"]["reduction"] if "reduction" in list(cfg["loss"].keys()) else "sum"
         return custom_mse
+    elif loss_function == "CrossEntropy":
+        return custom_cross_entropy
     else:
         raise NotImplementedError("This function is not implemented or does not exist.")
 
 
 def custom_mse(output, target, reduction: str = REDUCTION):
     return torch.nn.functional.mse_loss(output, target, reduction=reduction)
+
+
+def custom_cross_entropy(output, target):
+    return torch.nn.functional.cross_entropy(output, target)

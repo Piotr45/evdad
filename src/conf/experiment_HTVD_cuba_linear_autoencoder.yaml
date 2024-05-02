@@ -10,6 +10,9 @@ mlflow:
   run_name: slayer_cuba_HTVD_linear_autoencoder
   tags: {version: 0.1.0}
 
+training:
+  type: SLAYER
+
 dataloader:
   batch_size: 4
 

@@ -21,3 +21,4 @@ loss:
 training:
   epochs: 100
   skip_test: true
+  type: null

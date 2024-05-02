@@ -1,23 +1,28 @@
 defaults:
   - mlflow: local
   - train
-  - dataset: NMNIST
-  - model: slayer_cuba_cnn_autoencoder
+  - dataset: HTVD
+  - model: bootstrap_cuba_simple_conv
   - _self_
   
 mlflow:
-  experiment_name: SLAYER
-  run_name: slayer_cuba_NMNIST_cnn_autoencoder
+  experiment_name: Bootstrap
+  run_name: bootstrap_cuba_simple_conv
   tags: {version: 0.1.0}
 
 training:
-  type: SLAYER
+  type: Bootstrap
+  epochs: 100
+  skip_test: false
+
+dataloader:
+  batch_size: 128
 
 loss:
-  loss_function: MSE
+  loss_function: CrossEntropy
 
 dataset:
-  data_is_label: true
+  reshape_spike: false
 
 hydra:
   job:

@@ -10,6 +10,9 @@ mlflow:
   run_name: slayer_cuba_UCSD_cnn_autoencoder
   tags: {version: 0.1.0}
 
+training:
+  type: SLAYER
+
 loss:
   loss_function: MSE
 
