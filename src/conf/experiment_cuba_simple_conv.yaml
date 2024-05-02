@@ -11,6 +11,7 @@ mlflow:
   tags: {version: 0.1.0}
 
 training:
+  type: SLAYER
   epochs: 50
   skip_test: false
 

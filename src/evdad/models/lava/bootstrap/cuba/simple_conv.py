@@ -19,6 +19,11 @@ class SimpleConv(torch.nn.Module):
     ):
         super(SimpleConv, self).__init__()
 
+        self.C: int = C
+        self.H: int = H
+        self.W: int = W
+        self.T: int = T
+
         neuron_params = {
             "threshold": threshold,
             "current_decay": current_decay,
@@ -40,7 +45,7 @@ class SimpleConv(torch.nn.Module):
                 # enable affine transform at input
                 bootstrap.block.cuba.Conv(
                     neuron_params,
-                    2,
+                    C,
                     16,
                     3,
                     padding=1,

@@ -19,6 +19,11 @@ class SimpleDense(torch.nn.Module):
     ):
         super(SimpleDense, self).__init__()
 
+        self.C: int = C
+        self.H: int = H
+        self.W: int = W
+        self.T: int = T
+
         neuron_params = {
             "threshold": threshold,
             "current_decay": current_decay,
