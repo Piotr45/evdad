@@ -26,22 +26,28 @@ class LinearAutoEncoder(torch.nn.Module):
         self.W: int = W
         self.T: int = T
 
+        # neuron_params = {
+        #     "threshold": threshold,
+        #     "current_decay": current_decay,
+        #     "voltage_decay": voltage_decay,
+        #     "requires_grad": requires_grad,
+        #     "tau_grad": tau_grad,
+        #     "scale_grad": scale_grad,
+        #     "graded_spike": False,
+        # }
         neuron_params = {
-            "threshold": threshold,
-            "current_decay": current_decay,
-            "voltage_decay": voltage_decay,
-            "requires_grad": requires_grad,
-            "tau_grad": tau_grad,
-            "scale_grad": scale_grad,
-            "graded_spike": False,
-        }
+                'threshold'     : 0.1,
+                'current_decay' : 1,
+                'voltage_decay' : 0.1,
+                'requires_grad' : True,     
+            }
         neuron_params_drop = {
             **neuron_params,
             "dropout": slayer.neuron.Dropout(p=0.05),
             "norm": slayer.neuron.norm.MeanOnlyBatchNorm,
         }
 
-        c_hid = 512
+        c_hid = 2048
         weight_scale = 2
         weight_norm = True
         delay = True
@@ -57,38 +63,7 @@ class LinearAutoEncoder(torch.nn.Module):
                     weight_scale=weight_scale,
                     delay=delay,
                 ),
-                slayer.block.cuba.Dense(
-                    neuron_params,
-                    c_hid,
-                    c_hid // 2,
-                    weight_norm=weight_norm,
-                    weight_scale=weight_scale,
-                    delay=delay,
-                ),
-                slayer.block.cuba.Dense(
-                    neuron_params,
-                    c_hid // 2,
-                    c_hid // 4,
-                    weight_norm=weight_norm,
-                    weight_scale=weight_scale,
-                    delay=delay,
-                ),
-                slayer.block.cuba.Dense(
-                    neuron_params,
-                    c_hid // 4,
-                    c_hid // 2,
-                    weight_norm=weight_norm,
-                    weight_scale=weight_scale,
-                    delay=delay,
-                ),
-                slayer.block.cuba.Dense(
-                    neuron_params,
-                    c_hid // 2,
-                    c_hid,
-                    weight_norm=weight_norm,
-                    weight_scale=weight_scale,
-                    delay=delay,
-                ),
+                # Decoder
                 slayer.block.cuba.Dense(
                     neuron_params,
                     c_hid,

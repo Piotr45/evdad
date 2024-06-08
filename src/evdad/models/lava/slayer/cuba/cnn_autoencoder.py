@@ -28,7 +28,7 @@ class CNNAutoEncoder(torch.nn.Module):
 
         self.encoder = Encoder(
             C,
-            32,
+            16,
             threshold,
             current_decay,
             voltage_decay,
@@ -38,7 +38,7 @@ class CNNAutoEncoder(torch.nn.Module):
         )
         self.decoder = Decoder(
             C,
-            32,
+            16,
             threshold,
             current_decay,
             voltage_decay,
@@ -50,13 +50,7 @@ class CNNAutoEncoder(torch.nn.Module):
     def forward(self, spike: torch.Tensor) -> torch.Tensor:
         z, ec = self.encoder(spike)
         x_hat, c = self.decoder(z)
-
-        # TODO do it in model
-        N, C, H, W, T = x_hat.shape
-        zeros = torch.zeros((N, C, spike.shape[2], spike.shape[3], T))
-        zeros[:, :, :H, :W, :] = x_hat
-
-        return zeros.to("cuda"), torch.concat((ec, c), dim=1)
+        return x_hat, torch.concat((ec, c), dim=1)
 
     def grad_flow(self) -> torch.Tensor:
         grad = [b.synapse.grad_norm for b in self.blocks if hasattr(b, "synapse")]
@@ -106,7 +100,17 @@ class Encoder(torch.nn.Module):
                     out_features=c_hid,
                     kernel_size=3,
                     padding=1,
-                    stride=2,
+                    stride=1,
+                    weight_scale=weight_scale,
+                    weight_norm=weight_norm,
+                    delay=True,
+                ),
+                slayer.block.cuba.Pool(
+                    neuron_params_drop,
+                    2,
+                    stride=None,
+                    padding=0,
+                    dilation=1,
                     weight_scale=weight_scale,
                     weight_norm=weight_norm,
                     delay=True,
@@ -114,21 +118,10 @@ class Encoder(torch.nn.Module):
                 slayer.block.cuba.Conv(
                     neuron_params_drop,
                     in_features=c_hid,
-                    out_features=c_hid * 2,
+                    out_features=c_hid,
                     kernel_size=3,
                     padding=1,
-                    stride=2,
-                    weight_scale=weight_scale,
-                    weight_norm=weight_norm,
-                    delay=True,
-                ),
-                slayer.block.cuba.Conv(
-                    neuron_params_drop,
-                    in_features=c_hid * 2,
-                    out_features=c_hid * 4,
-                    kernel_size=3,
-                    padding=1,
-                    stride=2,
+                    stride=1,
                     weight_scale=weight_scale,
                     weight_norm=weight_norm,
                     delay=True,
@@ -179,35 +172,23 @@ class Decoder(torch.nn.Module):
 
         self.blocks = torch.nn.ModuleList(
             [
-                slayer.block.cuba.ConvT(
+                slayer.block.cuba.Unpool(
                     neuron_params_drop,
-                    in_features=c_hid * 4,
-                    out_features=c_hid * 2,
-                    kernel_size=3,
-                    padding=1,
-                    stride=2,
+                    2,
+                    stride=None,
+                    padding=0,
+                    dilation=1,
                     weight_scale=weight_scale,
                     weight_norm=weight_norm,
                     delay=True,
                 ),
-                slayer.block.cuba.ConvT(
-                    neuron_params_drop,
-                    in_features=c_hid * 2,
-                    out_features=c_hid,
-                    kernel_size=3,
-                    padding=1,
-                    stride=2,
-                    weight_scale=weight_scale,
-                    weight_norm=weight_norm,
-                    delay=True,
-                ),
-                slayer.block.cuba.ConvT(
+                slayer.block.cuba.Conv(
                     neuron_params_drop,
                     in_features=c_hid,
                     out_features=C,
                     kernel_size=3,
                     padding=1,
-                    stride=2,
+                    stride=1,
                     weight_scale=weight_scale,
                     weight_norm=weight_norm,
                     delay=True,

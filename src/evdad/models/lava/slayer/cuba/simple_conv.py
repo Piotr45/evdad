@@ -78,9 +78,20 @@ class SimpleConv(torch.nn.Module):
                     weight_norm=True,
                     delay=True,
                 ),
+                slayer.block.cuba.Conv(
+                    sdnn_cnn_params,
+                    64,
+                    128,
+                    3,
+                    padding=1,
+                    stride=2,
+                    weight_scale=2,
+                    weight_norm=True,
+                    delay=True,
+                ),
                 slayer.block.cuba.Flatten(),
-                slayer.block.cuba.Dense(sdnn_dense_params, 16384, 128, weight_norm=True, delay=True),
-                slayer.block.cuba.Affine(neuron_params, 128, 3, weight_norm=True),
+                slayer.block.cuba.Dense(sdnn_dense_params, 8192, 128, weight_norm=True, delay=True), # 16384
+                slayer.block.cuba.Affine(neuron_params, 128, C, weight_norm=True),
             ]
         )
 
