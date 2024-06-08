@@ -1,11 +1,11 @@
 defaults:
   - infer
-  - dataset: NMNIST
+  - dataset: UCSD
   - model: slayer_cuba_unet
   - _self_
 
 processing:
-  checkpoint: /home/piotr/evdad/outputs/train/NMNIST/UNET/2024-05-19_18-12-42/checkpoint_49.pt
+  checkpoint: /home/piotr/evdad/outputs/train/UCSD/UNET/2024-05-21_19-40-18/checkpoint_best.pt
   input_dir: null
 
 dataset:

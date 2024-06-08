@@ -1,16 +1,16 @@
 defaults:
   - infer
-  - dataset: NMNIST
-  - model: slayer_cuba_unet
+  - dataset: HTVD
+  - model: slayer_cuba_simple_dense
   - _self_
 
 processing:
-  checkpoint: /home/piotr/evdad/outputs/train/NMNIST/UNET/2024-05-19_18-12-42/checkpoint_49.pt
+  checkpoint: /home/piotr/evdad/outputs/train/HTVD_CLASSIFIER/2024-05-02_18-10-13/checkpoint_best.pt
   input_dir: null
 
 dataset:
-  reshape_spike: false
-  data_is_label: true
+  reshape_spike: true
+  data_is_label: false
 
 hydra:
   job:

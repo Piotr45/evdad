@@ -12,16 +12,20 @@ mlflow:
 
 training:
   type: SLAYER
+  epochs: 1000
 
 loss:
-  loss_function: MSE
+  loss_function: SpikeTime
+  time_constant: 100
+  length: 30
+  filter_order: 1
 
 dataset:
   reshape_spike: true
   data_is_label: true
 
 dataloader:
-  batch_size: 16
+  batch_size: 1
 
 hydra:
   job:

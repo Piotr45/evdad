@@ -2,33 +2,24 @@ defaults:
   - mlflow: local
   - train
   - dataset: UCSD
-  - model: slayer_cuba_cnn_autoencoder
+  - model: slayer_cuba_simple_dense
   - _self_
   
 mlflow:
   experiment_name: DEBUG
-  run_name: slayer_cuba_UCSD_cnn_autoencoder
+  run_name: slayer_cuba_simple_dense
   tags: {version: 0.1.0}
 
 training:
   type: SLAYER
-  epochs: 100
-
-loss:
-  loss_function: SpikeTime
-  time_constant: 2
-  filter_order: 2
-
-dataset:
-  data_is_label: true
-  reshape_spike: false
+  epochs: 50
+  skip_test: false
 
 dataloader:
-  batch_size: 16
+  batch_size: 32
 
-optimizer:
-  type: adam
-  lr: 0.1
+dataset:
+  reshape_spike: true
 
 hydra:
   job:
