@@ -1,4 +1,5 @@
 import logging
+from typing import Callable, Union
 
 import lava.lib.dl.slayer as slayer
 import torch
@@ -8,12 +9,12 @@ log = logging.getLogger(__name__)
 REDUCTION = "sum"
 
 
-def get_loss_function(cfg: dict, device: str) -> torch.nn.Module:
+def get_loss_function(cfg: dict, device: str) -> Union[torch.nn.Module, Callable]:
     """Get loss function based on given config.
 
-    Arfs:
+    Args:
         cfg: Hydra config.
-        defice: Torch device.
+        device: Torch device.
 
     Returns:
         Loss function.

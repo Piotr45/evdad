@@ -2,8 +2,8 @@ import hydra
 import torch
 
 
-def get_device() -> str:
-    """Function that checks which device is avalible.
+def get_device() -> torch.device:
+    """Function that checks which device is available.
 
     Returns:
         Torch device.

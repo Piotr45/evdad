@@ -2,7 +2,7 @@ import torch
 
 
 def get_optimizer(cfg: dict, net: torch.nn.Module) -> torch.optim.Optimizer:
-    """This function instantiates optimizer based on givem config.
+    """This function instantiates optimizer based on given config.
 
     Args:
         cfg: Config obtained from hydra plugin.
