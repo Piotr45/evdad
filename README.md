@@ -1,10 +1,15 @@
 # EVDAD
 
-An EVent-Driven Anomaly Detecion for Spiking Neural Networks.
+An EVent-Driven Anomaly Detection for Spiking Neural Networks.
 
 ## Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
+
+### Prerequisites
+
+- Python 3.10
+- CUDA 12.3 or 12.5
 
 ### Installing
 
