@@ -1,4 +1,5 @@
 """Dataset augmentation module."""
+
 import math
 
 import lava.lib.dl.slayer as slayer

@@ -3,9 +3,9 @@ import torch
 
 
 def get_classifier(cfg: dict) -> torch.nn.Module:
-    """Get calssifier based on given config.
+    """Get classifier based on given config.
 
-    Arfs:
+    Args:
         cfg: Hydra config.
 
     Returns:
