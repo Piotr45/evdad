@@ -53,7 +53,7 @@ class NMNISTDataset(Dataset):
         if self.data_is_label:
             label = spike.detach().clone()
         else:
-            label = os.path.basename(os.path.abspath(os.path.join(filename, os.pardir)))
+            label = int(os.path.basename(os.path.abspath(os.path.join(filename, os.pardir))))
 
         if self.reshape_spike:
             return (

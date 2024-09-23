@@ -1,7 +1,7 @@
 defaults:
   - mlflow: local
   - train
-  - dataset: HTVD
+  - dataset: NMNIST
   - model: slayer_cuba_simple_dense
   - _self_
   
