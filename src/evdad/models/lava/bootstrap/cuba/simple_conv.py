@@ -76,7 +76,7 @@ class SimpleConv(torch.nn.Module):
                 bootstrap.block.cuba.Flatten(),
                 bootstrap.block.cuba.Dense(
                     neuron_params_drop,
-                    16384,
+                    1600,
                     512,
                     weight_norm=weight_norm,
                     weight_scale=weight_scale,
@@ -84,7 +84,7 @@ class SimpleConv(torch.nn.Module):
                 bootstrap.block.cuba.Affine(
                     neuron_params,
                     512,
-                    3,
+                    10,
                     weight_norm=weight_norm,
                     weight_scale=weight_scale,
                 ),
