@@ -30,11 +30,11 @@ class MlflowHandler:
         self.tags: dict = tags
 
         self.client: MlflowClient = MlflowClient(self.mlflow_url)
-        self.experiment_id: int = self._get_or_create_experiment_id(self.experiment_name)
+        self.experiment_id: str = self._get_or_create_experiment_id(self.experiment_name)
         self.run: Run | None = None
 
     @property
-    def run_id(self) -> int:
+    def run_id(self) -> str:
         """Get run id."""
         return self.run.info.run_id
 

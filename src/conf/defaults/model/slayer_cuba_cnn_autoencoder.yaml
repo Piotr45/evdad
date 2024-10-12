@@ -8,6 +8,6 @@ scale_grad: 1
 requires_grad: false
 
 C: 2
-H: 128
-W: 128
+H: 34
+W: 34
 T: 30

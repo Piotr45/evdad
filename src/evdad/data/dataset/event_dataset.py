@@ -66,7 +66,7 @@ class EventDataset(Dataset):
 
     # @staticmethod
     def _read_label(self, path: str) -> str:
-        """Funtion that reads label file.
+        """Function that reads label file.
 
         Args:
             path: Path to label file

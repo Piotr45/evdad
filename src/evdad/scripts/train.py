@@ -178,7 +178,7 @@ def bootstrap_training_loop(
     return
 
 
-@hydra.main(version_base=None, config_path="../../conf")
+@hydra.main(version_base=None, config_path="../../conf/experiments")
 def main(cfg: DictConfig) -> None:
     setproctitle.setproctitle("evdad-train")
 
