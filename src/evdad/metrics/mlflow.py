@@ -1,3 +1,4 @@
+import os
 from typing import Any
 
 import mlflow
@@ -13,7 +14,7 @@ class MlflowHandler:
         self,
         experiment_name: str,
         run_name: None | str = None,
-        tags: dict = {},
+        tags: dict = None,
         mlflow_url: str = "http://127.0.0.1:5000/",
     ) -> None:
         """Metrics Logger handler.
@@ -27,7 +28,7 @@ class MlflowHandler:
         self.mlflow_url: str = mlflow_url
         self.experiment_name: str = experiment_name
         self.run_name: str | None = run_name
-        self.tags: dict = tags
+        self.tags: dict = tags if tags is not None else {}  # TODO add tags
 
         self.client: MlflowClient = MlflowClient(self.mlflow_url)
         self.experiment_id: str = self._get_or_create_experiment_id(self.experiment_name)
@@ -46,6 +47,7 @@ class MlflowHandler:
         """Start the run in Mlflow."""
         if self.run is None:
             self.run = self._create_run()
+            self.client.set_tag(run_id=self.run_id, key="mlflow.user", value=os.environ["USER"])
 
         mlflow.set_tracking_uri(self.mlflow_url)
         mlflow.set_experiment(experiment_id=self.experiment_id)
