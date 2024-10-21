@@ -2,8 +2,10 @@ import lava.lib.dl.slayer as slayer
 import matplotlib.pyplot as plt
 import torch
 
+from evdad.models.lava.slayer.interface import EVDADModel
 
-class CNNAutoEncoder(torch.nn.Module):
+
+class CNNAutoEncoder(EVDADModel):
     """Linear Auto Encoder model class."""
 
     def __init__(

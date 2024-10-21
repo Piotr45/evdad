@@ -87,6 +87,8 @@ def slayer_training_loop(
 
         mlflow_logger.log_artifact(get_logger_path("train.log"))
         stats.update()
+
+    net.export_hdf5(f"checkpoint_last.net")
     return
 
 

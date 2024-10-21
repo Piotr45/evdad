@@ -1,8 +1,10 @@
 import lava.lib.dl.slayer as slayer
 import torch
 
+from evdad.models.lava.slayer.interface import EVDADModel
 
-class SimpleConv(torch.nn.Module):
+
+class SimpleConv(EVDADModel):
     """Simple Conv model class."""
 
     def __init__(
