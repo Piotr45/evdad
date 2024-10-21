@@ -1,8 +1,10 @@
 import lava.lib.dl.slayer as slayer
 import torch
 
+from evdad.models.lava.slayer.interface import EVDADModel
 
-class SimpleDense(torch.nn.Module):
+
+class SimpleDense(EVDADModel):
     """Simple Dense model class."""
 
     def __init__(
