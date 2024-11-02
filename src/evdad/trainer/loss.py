@@ -3,6 +3,7 @@ from typing import Callable, Union
 
 import lava.lib.dl.slayer as slayer
 import torch
+import torch.nn.functional as F
 
 log = logging.getLogger(__name__)
 
@@ -48,6 +49,8 @@ def get_loss_function(cfg: dict, device: str) -> Union[torch.nn.Module, Callable
         return custom_mse
     elif loss_function == "CrossEntropy":
         return custom_cross_entropy
+    elif loss_function == "EventRateLoss":
+        return event_rate_loss
     else:
         raise NotImplementedError("This function is not implemented or does not exist.")
 
@@ -58,3 +61,7 @@ def custom_mse(output, target, reduction: str = REDUCTION):
 
 def custom_cross_entropy(output, target):
     return torch.nn.functional.cross_entropy(output, target)
+
+def event_rate_loss(x, max_rate=0.01):
+    mean_event_rate = torch.mean(torch.abs(x))
+    return F.mse_loss(F.relu(mean_event_rate - max_rate), torch.zeros_like(mean_event_rate))

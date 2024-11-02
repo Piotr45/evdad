@@ -77,7 +77,7 @@ def slayer_training_loop(
 
         save_new_checkpoint(net, epoch, mlflow_logger.run_id)
 
-        if stats.testing.best_accuracy:
+        if stats.testing.best_loss:
             checkpoint_data = {"checkpoint": net.state_dict(), "epoch": epoch, "run_id": mlflow_logger.run_id}
             torch.save(
                 checkpoint_data,
@@ -185,6 +185,7 @@ def main(cfg: DictConfig) -> None:
     setproctitle.setproctitle("evdad-train")
 
     log.info(OmegaConf.to_yaml(cfg))
+    log.info(f"Output will be saved at {get_hydra_dir_path()}")
 
     device = get_device()
     log.info(f"Using device: {device}")

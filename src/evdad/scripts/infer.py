@@ -38,26 +38,30 @@ def main(cfg: DictConfig) -> None:
 
     net = hydra.utils.instantiate(cfg["model"]).to(device)
     state = torch.load(cfg["processing"]["checkpoint"])
-    net.load_state_dict({"checkpoint": state}, strict=False)
+    net.load_state_dict(state["checkpoint"], strict=False)
 
     dataset = hydra.utils.instantiate(cfg["dataset"])
 
     train = dataset.get_train_dataset()
     train_loader = DataLoader(dataset=train, batch_size=1, shuffle=False)
+    test = dataset.get_test_dataset()
+    test_loader = DataLoader(dataset=test, batch_size=1, shuffle=False)
 
     shape = [net.C, net.H, net.W, net.T]
 
-    for idx, (im, label) in enumerate(train_loader):
+    for idx, (im, label) in enumerate(test_loader):
         reconstructed = net(im.to(device))
 
         reconstructed = np.reshape(reconstructed[0].cpu().detach().numpy(), shape).T
         img = np.reshape(im[0].cpu().detach().numpy(), shape).T
 
         out = np.hstack((events_to_image(img), events_to_image(reconstructed)))
-        cv2.imshow("Infer", out)
-        cv2.waitKey(0)
-        if idx == 5:
-            return
+        cv2.imshow("Inference", out)
+        key = cv2.waitKey(0)
+        if key == 27 or key == 113:
+            break
+    cv2.destroyAllWindows()
+
     return
 
 
