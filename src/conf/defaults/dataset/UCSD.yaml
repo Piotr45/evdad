@@ -1,7 +1,7 @@
 _target_: evdad.data.dataset.generic_event_dataset.GenericEventDataset
 
-train_data: /mnt/d/AI/SNN/Datasets/UCSD_Anomaly_Dataset/UCSD_Anomaly_Event_Dataset_30_Noisy_128x128/train_small.csv
-train_labels: /mnt/d/AI/SNN/Datasets/UCSD_Anomaly_Dataset/UCSD_Anomaly_Event_Dataset_30_Noisy_128x128/train_labels_small.csv
+train_data: /mnt/d/AI/SNN/Datasets/UCSD_Anomaly_Dataset/UCSD_Anomaly_Event_Dataset_30_Noisy_128x128/train.csv
+train_labels: /mnt/d/AI/SNN/Datasets/UCSD_Anomaly_Dataset/UCSD_Anomaly_Event_Dataset_30_Noisy_128x128/train_labels.csv
 test_data: /mnt/d/AI/SNN/Datasets/UCSD_Anomaly_Dataset/UCSD_Anomaly_Event_Dataset_30_Noisy_128x128/test.csv
 test_labels: /mnt/d/AI/SNN/Datasets/UCSD_Anomaly_Dataset/UCSD_Anomaly_Event_Dataset_30_Noisy_128x128/test_labels.csv
 

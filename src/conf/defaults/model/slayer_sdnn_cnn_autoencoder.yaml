@@ -1,0 +1,12 @@
+_target_: evdad.models.lava.slayer.sigma_delta.cnn_autoencoder.CNNAutoEncoder
+
+threshold: 0.1
+tau_grad: 0.5
+scale_grad: 1
+requires_grad: True
+shared_param: True
+
+C: 2
+H: 128
+W: 128
+T: 30

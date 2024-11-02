@@ -2,6 +2,7 @@ import h5py
 import lava.lib.dl.slayer as slayer
 import matplotlib.pyplot as plt
 import torch
+import torch.nn.functional as F
 
 from evdad.models.lava.slayer.interface import EVDADModel
 
@@ -16,11 +17,10 @@ class CNNAutoEncoder(EVDADModel):
         W: int,
         T: int,
         threshold: float,
-        current_decay: float,
-        voltage_decay: float,
         tau_grad: float,
         scale_grad: float,
         requires_grad: bool,
+        shared_param: bool,
     ):
         super(CNNAutoEncoder, self).__init__()
 
@@ -33,8 +33,6 @@ class CNNAutoEncoder(EVDADModel):
             C,
             32,
             threshold,
-            current_decay,
-            voltage_decay,
             tau_grad,
             scale_grad,
             requires_grad,
@@ -43,8 +41,6 @@ class CNNAutoEncoder(EVDADModel):
             C,
             32,
             threshold,
-            current_decay,
-            voltage_decay,
             tau_grad,
             scale_grad,
             requires_grad,
@@ -90,8 +86,6 @@ class Encoder(torch.nn.Module):
         C: int,
         base_channel_size: int,
         threshold: float,
-        current_decay: float,
-        voltage_decay: float,
         tau_grad: float,
         scale_grad: float,
         requires_grad: bool,
@@ -99,12 +93,12 @@ class Encoder(torch.nn.Module):
         super().__init__()
 
         neuron_params = {
-            "threshold": threshold,
-            "current_decay": current_decay,
-            "voltage_decay": voltage_decay,
-            "requires_grad": requires_grad,
-            "tau_grad": tau_grad,
-            "scale_grad": scale_grad,
+            "threshold": 0.1,  # delta unit threshold
+            "tau_grad": 0.5,  # delta unit surrogate gradient relaxation parameter
+            "scale_grad": 1,  # delta unit surrogate gradient scale parameter
+            "requires_grad": True,  # trainable threshold
+            "shared_param": True,  # layer wise threshold
+            "activation": F.relu,  # activation function
         }
         neuron_params_drop = {
             **neuron_params,
@@ -113,42 +107,39 @@ class Encoder(torch.nn.Module):
 
         c_hid = base_channel_size
         weight_scale = 2
-        weight_norm = False
+        weight_norm = True
 
         self.blocks = torch.nn.ModuleList(
             [
-                slayer.block.cuba.Conv(
-                    neuron_params_drop,
+                slayer.block.sigma_delta.Conv(
+                    neuron_params,
                     in_features=C,
                     out_features=c_hid,
                     kernel_size=3,
-                    padding=1,
+                    padding=0,
                     stride=2,
                     weight_scale=weight_scale,
                     weight_norm=weight_norm,
-                    delay=False,
                 ),
-                slayer.block.cuba.Conv(
-                    neuron_params_drop,
+                slayer.block.sigma_delta.Conv(
+                    neuron_params,
                     in_features=c_hid,
                     out_features=c_hid * 2,
                     kernel_size=3,
-                    padding=1,
+                    padding=0,
                     stride=2,
                     weight_scale=weight_scale,
                     weight_norm=weight_norm,
-                    delay=False,
                 ),
-                slayer.block.cuba.Conv(
-                    neuron_params_drop,
+                slayer.block.sigma_delta.Conv(
+                    neuron_params,
                     in_features=c_hid * 2,
                     out_features=c_hid * 4,
                     kernel_size=3,
-                    padding=1,
+                    padding=0,
                     stride=2,
                     weight_scale=weight_scale,
                     weight_norm=weight_norm,
-                    delay=False,
                 ),
             ]
         )
@@ -169,8 +160,6 @@ class Decoder(torch.nn.Module):
         C: int,
         base_channel_size: int,
         threshold: float,
-        current_decay: float,
-        voltage_decay: float,
         tau_grad: float,
         scale_grad: float,
         requires_grad: bool,
@@ -178,12 +167,12 @@ class Decoder(torch.nn.Module):
         super().__init__()
 
         neuron_params = {
-            "threshold": threshold,
-            "current_decay": current_decay,
-            "voltage_decay": voltage_decay,
-            "requires_grad": requires_grad,
-            "tau_grad": tau_grad,
-            "scale_grad": scale_grad,
+            "threshold": 0.1,  # delta unit threshold
+            "tau_grad": 0.5,  # delta unit surrogate gradient relaxation parameter
+            "scale_grad": 1,  # delta unit surrogate gradient scale parameter
+            "requires_grad": True,  # trainable threshold
+            "shared_param": True,  # layer wise threshold
+            "activation": F.relu,  # activation function
         }
         neuron_params_drop = {
             **neuron_params,
@@ -196,38 +185,35 @@ class Decoder(torch.nn.Module):
 
         self.blocks = torch.nn.ModuleList(
             [
-                slayer.block.cuba.ConvT(
-                    neuron_params_drop,
+                slayer.block.sigma_delta.ConvT(
+                    neuron_params,
                     in_features=c_hid * 4,
                     out_features=c_hid * 2,
                     kernel_size=3,
-                    padding=1,
+                    padding=0,
                     stride=2,
                     weight_scale=weight_scale,
                     weight_norm=weight_norm,
-                    delay=False,
                 ),
-                slayer.block.cuba.ConvT(
-                    neuron_params_drop,
+                slayer.block.sigma_delta.ConvT(
+                    neuron_params,
                     in_features=c_hid * 2,
                     out_features=c_hid,
                     kernel_size=3,
-                    padding=1,
+                    padding=0,
                     stride=2,
                     weight_scale=weight_scale,
                     weight_norm=weight_norm,
-                    delay=False,
                 ),
-                slayer.block.cuba.ConvT(
-                    neuron_params_drop,
+                slayer.block.sigma_delta.ConvT(
+                    neuron_params,
                     in_features=c_hid,
                     out_features=C,
                     kernel_size=3,
-                    padding=1,
+                    padding=0,
                     stride=2,
                     weight_scale=weight_scale,
                     weight_norm=weight_norm,
-                    delay=False,
                 ),
             ]
         )
