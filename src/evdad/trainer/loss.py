@@ -62,6 +62,7 @@ def custom_mse(output, target, reduction: str = REDUCTION):
 def custom_cross_entropy(output, target):
     return torch.nn.functional.cross_entropy(output, target)
 
+
 def event_rate_loss(x, max_rate=0.01):
     mean_event_rate = torch.mean(torch.abs(x))
     return F.mse_loss(F.relu(mean_event_rate - max_rate), torch.zeros_like(mean_event_rate))

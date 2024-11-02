@@ -1,7 +1,7 @@
+import h5py
 import lava.lib.dl.slayer as slayer
 import matplotlib.pyplot as plt
 import torch
-import h5py
 import torch.nn.functional as F
 
 from evdad.models.lava.slayer.interface import EVDADModel
@@ -93,12 +93,12 @@ class Encoder(torch.nn.Module):
         super().__init__()
 
         neuron_params = {
-            'threshold'    : 0.1,  # delta unit threshold
-            'tau_grad'     : 0.5,  # delta unit surrogate gradient relaxation parameter
-            'scale_grad'   : 1,  # delta unit surrogate gradient scale parameter
-            'requires_grad': True,  # trainable threshold
-            'shared_param' : True,  # layer wise threshold
-            'activation'   : F.relu,  # activation function
+            "threshold": 0.1,  # delta unit threshold
+            "tau_grad": 0.5,  # delta unit surrogate gradient relaxation parameter
+            "scale_grad": 1,  # delta unit surrogate gradient scale parameter
+            "requires_grad": True,  # trainable threshold
+            "shared_param": True,  # layer wise threshold
+            "activation": F.relu,  # activation function
         }
         neuron_params_drop = {
             **neuron_params,
@@ -124,7 +124,7 @@ class Encoder(torch.nn.Module):
                 slayer.block.sigma_delta.Conv(
                     neuron_params,
                     in_features=c_hid,
-                    out_features=c_hid*2,
+                    out_features=c_hid * 2,
                     kernel_size=3,
                     padding=0,
                     stride=2,
@@ -133,8 +133,8 @@ class Encoder(torch.nn.Module):
                 ),
                 slayer.block.sigma_delta.Conv(
                     neuron_params,
-                    in_features=c_hid*2,
-                    out_features=c_hid*4,
+                    in_features=c_hid * 2,
+                    out_features=c_hid * 4,
                     kernel_size=3,
                     padding=0,
                     stride=2,
@@ -167,12 +167,12 @@ class Decoder(torch.nn.Module):
         super().__init__()
 
         neuron_params = {
-            'threshold'    : 0.1,  # delta unit threshold
-            'tau_grad'     : 0.5,  # delta unit surrogate gradient relaxation parameter
-            'scale_grad'   : 1,  # delta unit surrogate gradient scale parameter
-            'requires_grad': True,  # trainable threshold
-            'shared_param' : True,  # layer wise threshold
-            'activation'   : F.relu,  # activation function
+            "threshold": 0.1,  # delta unit threshold
+            "tau_grad": 0.5,  # delta unit surrogate gradient relaxation parameter
+            "scale_grad": 1,  # delta unit surrogate gradient scale parameter
+            "requires_grad": True,  # trainable threshold
+            "shared_param": True,  # layer wise threshold
+            "activation": F.relu,  # activation function
         }
         neuron_params_drop = {
             **neuron_params,
@@ -187,8 +187,8 @@ class Decoder(torch.nn.Module):
             [
                 slayer.block.sigma_delta.ConvT(
                     neuron_params,
-                    in_features=c_hid*4,
-                    out_features=c_hid*2,
+                    in_features=c_hid * 4,
+                    out_features=c_hid * 2,
                     kernel_size=3,
                     padding=0,
                     stride=2,
@@ -197,7 +197,7 @@ class Decoder(torch.nn.Module):
                 ),
                 slayer.block.sigma_delta.ConvT(
                     neuron_params,
-                    in_features=c_hid*2,
+                    in_features=c_hid * 2,
                     out_features=c_hid,
                     kernel_size=3,
                     padding=0,

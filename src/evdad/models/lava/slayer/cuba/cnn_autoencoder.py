@@ -1,7 +1,7 @@
+import h5py
 import lava.lib.dl.slayer as slayer
 import matplotlib.pyplot as plt
 import torch
-import h5py
 
 from evdad.models.lava.slayer.interface import EVDADModel
 
