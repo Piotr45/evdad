@@ -1,7 +1,7 @@
 defaults:
   - mlflow: local
   - train
-  - dataset: NMNIST
+  - dataset: HTVD
   - model: slayer_cuba_simple_conv
   - _self_
 
@@ -11,12 +11,8 @@ mlflow:
   tags: {version: 0.1.0}
 
 training:
-  type: SLAYER
   epochs: 10
   skip_test: false
-
-dataset:
-  reshape_spike: false
 
 hydra:
   job:

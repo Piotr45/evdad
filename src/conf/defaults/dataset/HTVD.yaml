@@ -1,12 +1,15 @@
 _target_: evdad.data.dataset.generic_event_dataset.GenericEventDataset
 
-train_data: /mnt/d/AI/SNN/Datasets/Highway Traffic Videos Dataset/Highway_Traffic_Videos_Dataset_new_30_classifier/train.csv
-train_labels: /mnt/d/AI/SNN/Datasets/Highway Traffic Videos Dataset/Highway_Traffic_Videos_Dataset_new_30_classifier/train_labels.csv
-test_data: /mnt/d/AI/SNN/Datasets/Highway Traffic Videos Dataset/Highway_Traffic_Videos_Dataset_new_30_classifier/test.csv
-test_labels: /mnt/d/AI/SNN/Datasets/Highway Traffic Videos Dataset/Highway_Traffic_Videos_Dataset_new_30_classifier/test_labels.csv
+train_data: /mnt/d/AI/SNN/Datasets/Highway Traffic Videos Dataset/Highway_Traffic_Videos_Dataset/train
+train_labels: /mnt/d/AI/SNN/Datasets/Highway Traffic Videos Dataset/Highway_Traffic_Videos_Dataset/train
+#train_labels: null # Set to null if you want to use AutoEncoders
+test_data: /mnt/d/AI/SNN/Datasets/Highway Traffic Videos Dataset/Highway_Traffic_Videos_Dataset/test
+test_labels: /mnt/d/AI/SNN/Datasets/Highway Traffic Videos Dataset/Highway_Traffic_Videos_Dataset/test
+#test_labels: null # Set to null if you want to use AutoEncoders
 
-img_shape: [128, 128] # HW
-sampling_time: 1
-sample_length: 30
-
-num_classes: 3
+ST: 1
+SL: 30
+OL: 0
+C: 2
+H: 128
+W: 128

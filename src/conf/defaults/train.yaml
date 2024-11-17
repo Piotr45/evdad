@@ -5,7 +5,8 @@ dataset: null
 model: null
 
 dataloader:
-  batch_size: 128
+  batch_size: 16
+  num_workers: 0
 
 optimizer:
   type: adam
@@ -21,4 +22,3 @@ loss:
 training:
   epochs: 100
   skip_test: true
-  type: null

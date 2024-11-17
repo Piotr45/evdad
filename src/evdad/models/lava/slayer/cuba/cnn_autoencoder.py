@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import torch
 
 from evdad.models.lava.slayer.interface import EVDADModel
+from evdad.utils import get_device
 
 
 class CNNAutoEncoder(EVDADModel):
@@ -51,16 +52,16 @@ class CNNAutoEncoder(EVDADModel):
         )
 
     def forward(self, spike: torch.Tensor) -> torch.Tensor:
-        org = torch.tensor(torch.mean(spike).item()).reshape((1, -1)).to("cuda")
+        org = torch.tensor(torch.mean(spike).item()).reshape((1, -1)).to(spike.device)
         z, ec = self.encoder(spike)
         x_hat, c = self.decoder(z)
 
         # TODO do it in model
         N, C, H, W, T = x_hat.shape
-        zeros = torch.zeros((N, C, spike.shape[2], spike.shape[3], T))
+        zeros = torch.zeros((N, C, spike.shape[2], spike.shape[3], T), device=spike.device)
         zeros[:, :, :H, :W, :] = x_hat[:, :, :H, :W, :]
 
-        return zeros.to("cuda"), torch.concat((ec, c, org), dim=1)
+        return zeros, torch.concat((ec, c, org), dim=1)
         # return x_hat, torch.concat((ec, c, org), dim=1)
 
     def grad_flow(self) -> torch.Tensor:

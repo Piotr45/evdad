@@ -3,8 +3,12 @@ _target_: evdad.data.dataset.generic_nmnist_dataset.GenericNMNISTDataset
 train_data: /mnt/d/AI/SNN/Datasets/nmnist/train
 test_data: /mnt/d/AI/SNN/Datasets/nmnist/test
 
-img_shape: [34, 34] # HW
-sampling_time: 1
-sample_length: 30
+ST: 1
+SL: 30
+OL: 0
+C: 2
+H: 34
+W: 34
+
 
 num_classes: 10
