@@ -115,7 +115,6 @@ class EventDataset(Dataset):
                 self.cache["labels"][filename] = labels
         return labels[begin:end][0]
 
-
     @staticmethod
     def _read_label(path: str) -> torch.Tensor:
         """Function that reads label file.
@@ -130,10 +129,5 @@ class EventDataset(Dataset):
 
     def _create_cache(self) -> dict:
         if self.labels is not None:
-            return {
-                "spikes": {},
-                "labels": {}
-            }
-        return {
-            "spikes": {}
-        }
+            return {"spikes": {}, "labels": {}}
+        return {"spikes": {}}
