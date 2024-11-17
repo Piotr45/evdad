@@ -31,63 +31,91 @@ def save_new_checkpoint(net: torch.nn.Module, epoch: int, run_id: str) -> None:
         os.remove(last_checkpoint_path)
 
 
-def slayer_training_loop(
+def bootstrap_training_loop(
     net: torch.nn.Module,
     train_loader: DataLoader,
     test_loader: Union[DataLoader, None],
     mlflow_logger: MlflowClient,
     stats: slayer.utils.LearningStats,
-    assistant: slayer.utils.Assistant,
+    error: Any,
+    optimizer: Any,
     skip_test: bool,
     epochs: int,
 ) -> None:
+    scheduler = bootstrap.routine.Scheduler(num_sample_iter=10, sample_period=10)
     device = get_device()
+
     for epoch in tqdm.tqdm(
-        range(1, epochs + 1),
+        range(0, epochs),
         desc="Epochs",
     ):
-        for i, (input, target) in enumerate(train_loader):  # training loop
-            _, count = assistant.train(
-                input.to(device, dtype=torch.float),
-                target.to(device),  # target.to(device, dtype=torch.float),
-            )
-            header = ["Event rate: " + ", ".join([f"{c.item():.4f}" for c in count.flatten()])]
-            stats.print(epoch, iter=i, dataloader=train_loader, header=header)
+        for i, (input, target) in enumerate(train_loader, 0):
+            net.train()
+            mode = scheduler.mode(epoch, i, net.training)
 
-        # log.info(
-        #     f"Epoch: {epoch}\tTraining loss: {stats.training.loss}\tTraining accuracy: {stats.training.accuracy}\t{header[0]}\tEvent input: {torch.mean(target).item()}"
-        # )
+            input = input.to(device)
 
-        mlflow_logger.log_metric("training_loss", stats.training.loss, step=epoch)
-        mlflow_logger.log_metric("training_accuracy", stats.training.accuracy, step=epoch)
+            output, count = net.forward(input, mode)
+
+            loss = error(output, target.to(device))
+
+            prediction = output.data.max(1, keepdim=True)[1].cpu().flatten()
+            # prediction = torch.squeeze(output.data.max(1, keepdim=True)[1].cpu())
+
+            stats.training.num_samples += len(target)
+            # stats.training.num_samples += len(label.flatten())
+            stats.training.loss_sum += loss.cpu().data.item() * input.shape[0]
+            stats.training.correct_samples += torch.sum(prediction == target).data.item()
+            # stats.training.correct_samples += torch.sum(prediction == label.flatten()).data.item()
+
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+
+            header = [str(mode)]
+            header += ["Event rate : " + ", ".join([f"{c.item():.4f}" for c in count.flatten()])]
+            stats.print(epoch + 1, iter=i, header=header, dataloader=train_loader)
+
+        mlflow_logger.log_metric("training_loss", stats.training.loss, step=epoch + 1)
+        mlflow_logger.log_metric("training_accuracy", stats.training.accuracy, step=epoch + 1)
 
         if not skip_test:
-            for i, (input, target) in enumerate(test_loader):  # test loop
-                _, count = assistant.test(
-                    input.to(device, dtype=torch.float),
-                    target.to(device),  # target.to(device, dtype=torch.float),
-                )
-                stats.print(epoch, iter=i, dataloader=test_loader)
+            for i, (input, target) in enumerate(test_loader, 0):
+                net.eval()
+                mode = scheduler.mode(epoch, i, net.training)
 
-            # log.info(f"Epoch: {epoch}\tTest loss: {stats.testing.loss}\tTest accuracy: {stats.testing.accuracy}")
+                with torch.no_grad():
+                    input = input.to(device)
 
-            mlflow_logger.log_metric("test_loss", stats.testing.loss, step=epoch)
-            mlflow_logger.log_metric("test_accuracy", stats.testing.accuracy, step=epoch)
+                    output, count = net.forward(input, mode=scheduler.mode(epoch, i, net.training))
 
-        save_new_checkpoint(net, epoch, mlflow_logger.run_id)
+                    loss = error(output, target.to(device))
+                    prediction = output.data.max(1, keepdim=True)[1].cpu().flatten()
 
-        if stats.testing.best_loss:
-            checkpoint_data = {"checkpoint": net.state_dict(), "epoch": epoch, "run_id": mlflow_logger.run_id}
+                stats.testing.num_samples += len(target)
+                # stats.testing.num_samples += len(label.flatten())
+                stats.testing.loss_sum += loss.cpu().data.item() * input.shape[0]
+                stats.testing.correct_samples += torch.sum(prediction == target).data.item()
+                # stats.testing.correct_samples += torch.sum(prediction == label.flatten()).data.item()
+
+                header = [str(mode)]
+                header += ["Event rate : " + ", ".join([f"{c.item():.4f}" for c in count.flatten()])]
+                stats.print(epoch + 1, iter=i, header=header, dataloader=test_loader)
+
+            mlflow_logger.log_metric("test_loss", stats.testing.loss, step=epoch + 1)
+            mlflow_logger.log_metric("test_accuracy", stats.testing.accuracy, step=epoch + 1)
+
+        save_new_checkpoint(net, epoch + 1, mlflow_logger.run_id)
+
+        if stats.testing.best_accuracy:
+            checkpoint_data = {"checkpoint": net.state_dict(), "epoch": epoch + 1, "run_id": mlflow_logger.run_id}
             torch.save(
                 checkpoint_data,
                 os.path.join(get_hydra_dir_path(), "checkpoint_best.pt"),
             )
-            # mlflow.pytorch.log_model(net, mlflow_logger.run_id) # TODO fix warnings
 
-        mlflow_logger.log_artifact(get_logger_path("slayer_train.log"))
+        mlflow_logger.log_artifact(get_logger_path("bootstrap_train.log"))
         stats.update()
-
-    net.export_hdf5(f"checkpoint_last.net")
     return
 
 
@@ -135,15 +163,6 @@ def main(cfg: DictConfig) -> None:
 
     stats = slayer.utils.LearningStats()
 
-    assistant = slayer.utils.Assistant(
-        net=net,
-        error=error,
-        optimizer=optimizer,
-        stats=stats,
-        classifier=get_classifier(cfg),
-        count_log=True,
-    )
-
     mlflow_logger = hydra.utils.instantiate(cfg["mlflow"])
 
     mlflow_logger.run_experiment()
@@ -152,16 +171,17 @@ def main(cfg: DictConfig) -> None:
     mlflow_logger.log_param("batch size", batch_size)
     mlflow_logger.log_param("learning rate", lr)
 
-    mlflow_logger.log_artifact(get_logger_path("slayer_train.log"))
+    mlflow_logger.log_artifact(get_logger_path("bootstrap_train.log"))
 
     torch.cuda.empty_cache()
-    slayer_training_loop(
+    bootstrap_training_loop(
         net=net,
         train_loader=train_loader,
         test_loader=test_loader if not skip_test else None,
         mlflow_logger=mlflow_logger,
         stats=stats,
-        assistant=assistant,
+        error=error,
+        optimizer=optimizer,
         skip_test=skip_test,
         epochs=epochs,
     )
