@@ -2,9 +2,9 @@ from setuptools import setup
 
 setup(
     name="evdad",
-    version="0.1.0",
+    version="0.2.0",
     author="Piotr45",
-    author_email="piotr.baryczkowski@student.put.poznan.pl",
+    author_email="piotr.baryczkowski@put.poznan.pl",
     description="My masters thesis project",
     package_dir={"": "src"},
     package_data={"": ["*.yaml", "**/*.yaml", "conf"]},
