@@ -1,7 +1,7 @@
 defaults:
   - mlflow: local
   - train
-  - dataset: UCSD
+  - dataset: HTVD
   - model: slayer_sdnn_cnn_autoencoder
   - _self_
   
@@ -10,17 +10,8 @@ mlflow:
   run_name: slayer_sdnn_NMNIST_cnn_autoencoder
   tags: {version: 0.1.0}
 
-training:
-  type: SLAYER
-
 loss:
   loss_function: SpikeTime
-
-dataset:
-  data_is_label: true
-
-dataloader:
-  batch_size: 16
 
 hydra:
   job:

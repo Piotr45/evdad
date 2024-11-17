@@ -45,9 +45,12 @@ class EventDataset(Dataset):
         self.events: dict[str, PathStr] = {
             os.path.splitext(os.path.basename(path))[0]: path for path in parse_dataset_input(data, "bin")
         }
-        self.labels: dict[str, PathStr] = {
-            os.path.splitext(os.path.basename(path))[0]: path for path in parse_dataset_input(labels, "csv")
-        }
+        if labels is not None:
+            self.labels: dict[str, PathStr] = {
+                os.path.splitext(os.path.basename(path))[0]: path for path in parse_dataset_input(labels, "csv")
+            }
+        else:
+            self.labels = None
 
         self.sampling_time: int = ST
         self.sample_length: int = SL
@@ -58,13 +61,12 @@ class EventDataset(Dataset):
 
         self.num_time_bins: int = int(self.sample_length / self.sampling_time)
 
-        self.metadata: list[tuple[str, int, int, int]] = self.create_item_metadata()
+        self.metadata: list[tuple[str, int, int, int]] = self.create_metadata()
 
-        self._label_cache: dict[str, torch.Tensor] = {}
-        self._spikes_cache: dict[str, torch.Tensor] = {}
-        self.use_cache = use_cache
+        self.use_cache: bool = use_cache
+        self.cache: dict = self._create_cache()
 
-    def create_item_metadata(self) -> list[tuple[str, int, int, int]]:
+    def create_metadata(self) -> list[tuple[str, int, int, int]]:
         metadata = []
         for filename, events_path in self.events.items():
             # Read number of frames based on nuber of labels
@@ -81,24 +83,41 @@ class EventDataset(Dataset):
 
     def __getitem__(self, index: int) -> tuple:
         """Gets data and label from dataset."""
+        spikes = self.get_item_data(index)
+        if self.labels is not None:
+            labels = self.get_item_label(index)
+            return spikes, labels
+        return spikes, spikes.clone()
+
+    def get_item_data(self, index: int) -> torch.Tensor:
         filename, begin, end, num_frames = self.metadata[index]
 
-        if self.use_cache and filename in self._spikes_cache.keys():
+        if self.use_cache and filename in self.cache["spikes"].keys():
             # Use cached data
-            labels = self._label_cache[filename]
-            spikes = self._spikes_cache[filename]
+            spikes = self.cache["spikes"][filename]
         else:
-            labels = self._read_label(self.labels[filename])
             event = read_2d_spikes(self.events[filename])
             spikes = torch.zeros((self.num_channels, self.height, self.width, num_frames), dtype=torch.float32)
             spikes = event.fill_tensor(spikes, sampling_time=self.sampling_time)
             if self.use_cache:
-                self._spikes_cache[filename] = spikes
-                self._label_cache[filename] = labels
-        return spikes[..., begin:end], labels[begin:end][0]
+                self.cache["spikes"][filename] = spikes
+        return spikes[..., begin:end]
 
-    # @staticmethod
-    def _read_label(self, path: str) -> torch.Tensor:
+    def get_item_label(self, index: int) -> torch.Tensor:
+        filename, begin, end, num_frames = self.metadata[index]
+
+        if self.use_cache and filename in self.cache["labels"].keys():
+            # Use cached data
+            labels = self.cache["labels"][filename]
+        else:
+            labels = self._read_label(self.labels[filename])
+            if self.use_cache:
+                self.cache["labels"][filename] = labels
+        return labels[begin:end][0]
+
+
+    @staticmethod
+    def _read_label(path: str) -> torch.Tensor:
         """Function that reads label file.
 
         Args:
@@ -108,3 +127,13 @@ class EventDataset(Dataset):
             Label in the desired form
         """
         return torch.tensor([int(label) for label in read_csv(path)], dtype=torch.long)
+
+    def _create_cache(self) -> dict:
+        if self.labels is not None:
+            return {
+                "spikes": {},
+                "labels": {}
+            }
+        return {
+            "spikes": {}
+        }

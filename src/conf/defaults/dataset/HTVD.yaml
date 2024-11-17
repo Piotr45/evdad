@@ -2,8 +2,10 @@ _target_: evdad.data.dataset.generic_event_dataset.GenericEventDataset
 
 train_data: /mnt/d/AI/SNN/Datasets/Highway Traffic Videos Dataset/Highway_Traffic_Videos_Dataset/train
 train_labels: /mnt/d/AI/SNN/Datasets/Highway Traffic Videos Dataset/Highway_Traffic_Videos_Dataset/train
+#train_labels: null # Set to null if you want to use AutoEncoders
 test_data: /mnt/d/AI/SNN/Datasets/Highway Traffic Videos Dataset/Highway_Traffic_Videos_Dataset/test
 test_labels: /mnt/d/AI/SNN/Datasets/Highway Traffic Videos Dataset/Highway_Traffic_Videos_Dataset/test
+#test_labels: null # Set to null if you want to use AutoEncoders
 
 ST: 1
 SL: 30

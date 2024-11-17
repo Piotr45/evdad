@@ -1,7 +1,7 @@
 defaults:
   - mlflow: local
   - train
-  - dataset: NMNIST
+  - dataset: HTVD
   - model: slayer_cuba_linear_autoencoder
   - _self_
   
@@ -10,15 +10,8 @@ mlflow:
   run_name: slayer_cuba_NMNIST_linear_autoencoder
   tags: {version: 0.1.0}
 
-training:
-  type: SLAYER
-
 loss:
   loss_function: MSE
-
-dataset:
-  reshape_spike: true
-  data_is_label: true
 
 hydra:
   job:

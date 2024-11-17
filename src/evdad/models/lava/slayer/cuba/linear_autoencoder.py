@@ -75,6 +75,7 @@ class LinearAutoEncoder(EVDADModel):
                     weight_scale=weight_scale,
                     delay=delay,
                 ),
+                # Decoder
                 slayer.block.cuba.Dense(
                     neuron_params,
                     c_hid // 4,
