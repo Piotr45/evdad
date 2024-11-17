@@ -41,7 +41,6 @@ def slayer_training_loop(
     skip_test: bool,
     epochs: int,
 ) -> None:
-    """TODO"""
     device = get_device()
     for epoch in tqdm.tqdm(
         range(1, epochs + 1),
@@ -50,7 +49,7 @@ def slayer_training_loop(
         for i, (input, target) in enumerate(train_loader):  # training loop
             _, count = assistant.train(
                 input.to(device, dtype=torch.float),
-                target,  # target.to(device, dtype=torch.float),
+                target.to(device),  # target.to(device, dtype=torch.float),
             )
             header = ["Event rate: " + ", ".join([f"{c.item():.4f}" for c in count.flatten()])]
             stats.print(epoch, iter=i, dataloader=train_loader, header=header)
@@ -66,7 +65,7 @@ def slayer_training_loop(
             for i, (input, target) in enumerate(test_loader):  # test loop
                 _, count = assistant.test(
                     input.to(device, dtype=torch.float),
-                    target,  # target.to(device, dtype=torch.float),
+                    target.to(device),  # target.to(device, dtype=torch.float),
                 )
                 stats.print(epoch, iter=i, dataloader=test_loader)
 
@@ -197,14 +196,14 @@ def main(cfg: DictConfig) -> None:
     lr = cfg["optimizer"]["lr"]
     skip_test = cfg["training"]["skip_test"]
     dl_lib_type = cfg["training"]["type"]
+    num_workers = cfg["dataloader"]["num_workers"]
 
     train = dataset.get_train_dataset()
     train_loader = DataLoader(
         dataset=train,
         batch_size=batch_size,
         shuffle=True,
-        num_workers=4,
-        prefetch_factor=2,
+        num_workers=num_workers,
     )
 
     if not skip_test:
@@ -213,8 +212,7 @@ def main(cfg: DictConfig) -> None:
             dataset=test,
             batch_size=batch_size,
             shuffle=True,
-            num_workers=4,
-            prefetch_factor=2,
+            num_workers=num_workers,
         )
 
     net = hydra.utils.instantiate(cfg["model"]).to(device)
