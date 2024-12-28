@@ -8,7 +8,7 @@ defaults:
 mlflow:
   experiment_name: Bootstrap
   run_name: bootstrap_cuba_simple_dense
-  tags: {version: 0.1.0}
+  tags: {version: 0.2.0}
 
 training:
   epochs: 10
