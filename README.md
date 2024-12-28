@@ -27,13 +27,7 @@ python -m venv evdad-venv
 source evdad-venv/bin/activate
 ```
 
-Install requirements.
-
-```bash
-pip install -r requirements.txt
-```
-
-Install EVDAD package.
+Install EVDAD and requirements via pyproject.toml.
 
 ```bash
 pip install -e .
@@ -42,7 +36,9 @@ hash -r
 
 ## Running the tests
 
-TODO if time
+```bash
+pytest --cov=evdad tests/unit --cov-fail-under=35
+```
 
 ## Tutorials
 
