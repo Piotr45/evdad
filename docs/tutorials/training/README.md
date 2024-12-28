@@ -12,10 +12,11 @@ mlflow ui --host 127.0.0.1 --port 5000
 
 **NOTE:** This will create two folders *mlruns* and *mlartifacts*. It is prefered to this in separate directory or in *evdad* main directory.
 
-Then in other terminal, we will use `evdad-train` console script to run the training.
+Then in other terminal, we will use `evdad-bootstrap-train` or `evdad-slayer-train` console script to run the training.
 
 ```bash
-evdad-train --config-name=experiment_name hydra.run.dir=/path/to/output/dir     
+evdad-bootstrap-train --config-name=experiment_name hydra.run.dir=/path/to/output/dir
+evdad-slayer-train --config-name=experiment_name hydra.run.dir=/path/to/output/dir     
 ```
 
 Flags:
@@ -26,37 +27,30 @@ Flags:
  ### Example config
 
  ```yaml
- defaults:
+defaults:
   - mlflow: local
   - train
-  - dataset: NMNIST
-  - model: slayer_cuba_cnn_autoencoder
+  - dataset: HTVD
+  - model: slayer_sdnn_cnn_autoencoder
   - _self_
   
 mlflow:
   experiment_name: SLAYER
-  run_name: slayer_cuba_NMNIST_cnn_autoencoder
+  run_name: slayer_sdnn_NMNIST_cnn_autoencoder
   tags: {version: 0.1.0}
-
-training:
-  epochs: 5
-
-dataset:
-  data_is_label: true
-
-dataloader:
-  batch_size: 128
 
 loss:
   loss_function: SpikeTime
-  time_constant: 5
-  length: 100
-  filter_order: 1
-  reduction: sum
 
 hydra:
   job:
     chdir: true
   searchpath:
-    - file:///${oc.env:HOME}/evdad/src/conf/defaults
+    - pkg://conf.defaults
  ``` 
+
+Example command
+
+```bash
+evdad-slayer-train --config-name=slayer_train_autoencoder_CUBA_dense hydra.run.dir=$SNN_EXPERIMENTS/$(date +%Y-%m-%d_%H-%M-%S)_piotr_debug training.epochs=1 +dataset.use_cache=true 
+```

@@ -44,12 +44,13 @@ class SimpleDense(EVDADModel):
 
         self.blocks = torch.nn.ModuleList(
             [
+                slayer.block.cuba.Flatten(),
                 slayer.block.cuba.Dense(neuron_params_drop, H * W * C, 256, weight_norm=weight_norm, delay=True),
                 slayer.block.cuba.Dense(neuron_params_drop, 256, 128, weight_norm=weight_norm, delay=True),
                 slayer.block.cuba.Dense(neuron_params_drop, 128, 64, weight_norm=weight_norm, delay=True),
                 slayer.block.cuba.Dense(neuron_params_drop, 64, 32, weight_norm=weight_norm, delay=True),
                 slayer.block.cuba.Dense(neuron_params_drop, 32, 16, weight_norm=weight_norm, delay=True),
-                slayer.block.cuba.Affine(neuron_params, 16, 10, weight_norm=True),
+                slayer.block.cuba.Affine(neuron_params, 16, 3, weight_norm=True),
             ]
         )
 

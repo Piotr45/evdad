@@ -5,8 +5,12 @@ train_labels: /mnt/d/AI/SNN/Datasets/UCSD_Anomaly_Dataset/UCSD_Anomaly_Event_Dat
 test_data: /mnt/d/AI/SNN/Datasets/UCSD_Anomaly_Dataset/UCSD_Anomaly_Event_Dataset_30_Noisy_128x128/test.csv
 test_labels: /mnt/d/AI/SNN/Datasets/UCSD_Anomaly_Dataset/UCSD_Anomaly_Event_Dataset_30_Noisy_128x128/test_labels.csv
 
-img_shape: [128, 128] # HW
-sampling_time: 1
-sample_length: 30
+ST: 1
+SL: 30
+OL: 0
+C: 2
+H: 128
+W: 128
+
 
 num_classes: 2

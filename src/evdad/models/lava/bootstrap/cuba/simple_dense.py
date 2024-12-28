@@ -42,10 +42,11 @@ class SimpleDense(torch.nn.Module):
 
         self.blocks = torch.nn.ModuleList(
             [
+                bootstrap.block.cuba.Flatten(),
                 # enable affine transform at input
                 bootstrap.block.cuba.Dense(
                     neuron_params_drop,
-                    34 * 34 * 2,
+                    self.H * self.W * self.C,
                     512,
                     weight_norm=weight_norm,
                     weight_scale=weight_scale,
@@ -60,7 +61,7 @@ class SimpleDense(torch.nn.Module):
                 bootstrap.block.cuba.Affine(
                     neuron_params,
                     512,
-                    10,
+                    3,
                     weight_norm=weight_norm,
                     weight_scale=weight_scale,
                 ),

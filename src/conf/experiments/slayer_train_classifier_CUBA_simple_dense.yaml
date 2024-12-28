@@ -1,23 +1,18 @@
 defaults:
   - mlflow: local
   - train
-  - dataset: NMNIST
-  - model: slayer_cuba_cnn_autoencoder
+  - dataset: HTVD
+  - model: slayer_cuba_simple_dense
   - _self_
   
 mlflow:
   experiment_name: SLAYER
-  run_name: slayer_cuba_NMNIST_cnn_autoencoder
-  tags: {version: 0.1.0}
+  run_name: slayer_cuba_simple_dense
+  tags: {version: 0.2.0}
 
 training:
-  type: SLAYER
-
-loss:
-  loss_function: SpikeTime
-
-dataset:
-  data_is_label: true
+  epochs: 10
+  skip_test: false
 
 hydra:
   job:

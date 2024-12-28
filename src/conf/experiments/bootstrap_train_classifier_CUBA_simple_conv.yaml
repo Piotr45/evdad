@@ -1,28 +1,21 @@
 defaults:
   - mlflow: local
   - train
-  - dataset: NMNIST
-  - model: bootstrap_cuba_simple_dense
+  - dataset: HTVD
+  - model: bootstrap_cuba_simple_conv
   - _self_
   
 mlflow:
   experiment_name: Bootstrap
-  run_name: bootstrap_cuba_simple_dense
-  tags: {version: 0.1.0}
+  run_name: bootstrap_cuba_simple_conv
+  tags: {version: 0.2.0}
 
 training:
-  type: Bootstrap
   epochs: 10
   skip_test: false
 
-dataloader:
-  batch_size: 128
-
 loss:
   loss_function: CrossEntropy
-
-dataset:
-  reshape_spike: true
 
 hydra:
   job:
