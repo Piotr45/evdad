@@ -61,6 +61,8 @@ dataset
            └─ 00004.bin
 ```
 
+![nmnist example](/docs/assets/nmnist_data_example.JPG)
+
 ## HTVD Highway Traffic Videos Dataset
 
 This a [database](https://www.kaggle.com/datasets/aryashah2k/highway-traffic-videos-dataset) of video of traffic on the highway used in [1] and [2]. The video was taken over two days from a stationary camera overlooking I-5 in
@@ -75,6 +77,8 @@ provided courtesy of Washington State Department of Transportation
 [http://www.wsdot.wa.gov/].
 
 **NOTE**: This dataset was converted to Event Driven Videos with [Easy V2E](https://github.com/Piotr45/easy-v2e).
+
+![data comparison](/docs/assets/htvd_data_comparison.png)
 
 ## UBI-Fights
 
